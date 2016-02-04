@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 
 public class ProjectActions extends AbstractContentManager {
 
@@ -31,6 +33,8 @@ public class ProjectActions extends AbstractContentManager {
     protected Project project;
     protected AccessLevel accessLevel;
     protected boolean projectExists;
+
+    private String appUrl = "http://nquire-it.org";
 
 
     public ProjectActions(ContextBean context, Long projectId, UserProfile user, boolean tokenOk) {
@@ -321,18 +325,26 @@ public class ProjectActions extends AbstractContentManager {
             context.getCommentsDao().comment(user, project, request);
             context.getProjectDao().updateActivityTimestamp(project);
 
-            Mailer mailer = new Mailer();
-            mailer.sendMail(
-                "New mission comment - " + project.getTitle(),
-                "Hello nQuire-it user,\n\n" +
-                "There is a new comment on the mission '" + project.getTitle() + "' from '" + user.getUsername() + "':\n" +
-                "http://www.nquire-it.org/#/project/" + project.getId() + "\n\n" +
-                "To stop receiving these messages, update your notification preferences at:\n" +
-                "http://www.nquire-it.org/#/profile\n\n" +
-                "Warm regards,\nnQuire-it team",
-                context.getUserProfileDao().commentNotifications(project.getId(), user.getId()),
-                true
-            );
+            final List<UserProfile> notifications = context.getUserProfileDao().commentNotifications(project.getId(), user.getId());
+            final String projectTitle = project.getTitle();
+            final String projId = project.getId().toString();
+            final String username = user.getUsername();
+            context.getTaskExecutor().execute( new Runnable() {
+                @Override
+                public void run() {
+                    Mailer.sendMail(
+                        "New mission comment - " + projectTitle,
+                        "Hello nQuire-it user,\n\n" +
+                        "There is a new comment on the mission '" + projectTitle + "' from '" + username + "':\n" +
+                        "http://www.nquire-it.org/#/project/" + projId + "\n\n" +
+                        "To stop receiving these messages, update your notification preferences at:\n" +
+                        "http://www.nquire-it.org/#/profile\n\n" +
+                        "Warm regards,\nnQuire-it team",
+                        notifications,
+                        true
+                    );
+                }
+            });
 
             return project.getComments();
         }
@@ -355,6 +367,27 @@ public class ProjectActions extends AbstractContentManager {
         if (hasAccess(PermissionType.PROJECT_COMMENT) || (loggedWithToken && voteData.isReport())) {
             Comment comment = context.getCommentsDao().getComment(project, commentId);
             if (comment != null) {
+                if (voteData.isReport()) {
+                        final String url = this.appUrl;
+                        final List<UserProfile> notifications = context.getUserProfileDao().listAdmins();
+                        context.getTaskExecutor().execute( new Runnable() {
+                            @Override
+                            public void run() {
+                                Mailer.sendMail(
+                                    "Inappropriate content reported",
+                                    "Hello nQuire-it administrator,\n\n" +
+                                    "Inappropriate content has been reported on the nQuire-it website.\n\n" +
+                                    "Please review the reports and take appropriate action.\n\n" +
+                                    url + "/#/admin/reported\n\n" +
+                                    "This is an automatically generated e-mail sent to all administrators.  " +
+                                    "To stop receiving these messages, arrange for your administrator status to be revoked.\n\n" +
+                                    "Warm regards,\nnQuire-it team",
+                                    notifications,
+                                    false
+                                );
+                            }
+                        });
+                    }
                 return context.getVoteDao().vote(user, comment, voteData);
             }
         }

@@ -7,12 +7,12 @@ import org.greengin.nquireit.entities.users.PermissionType;
 import org.greengin.nquireit.entities.users.UserProfile;
 
 public class AbstractContentManager {
-	protected UserProfile user;
+    protected UserProfile user;
     protected boolean tokenOk;
     protected boolean loggedIn;
     protected boolean loggedWithToken;
 
-	protected HttpServletRequest request;
+    protected HttpServletRequest request;
 
     protected ContextBean context;
 

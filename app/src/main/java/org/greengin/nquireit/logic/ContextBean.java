@@ -10,6 +10,7 @@ import org.greengin.nquireit.logic.users.SubscriptionManagerBean;
 import org.greengin.nquireit.logic.users.UserServiceBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 
 
 public class ContextBean implements InitializingBean {
@@ -92,6 +93,10 @@ public class ContextBean implements InitializingBean {
     @Autowired
     @Getter
     FilterDao filterDao;
+    
+    @Autowired
+    @Getter
+    TaskExecutor taskExecutor;
 
     @Override
     public void afterPropertiesSet() throws Exception {

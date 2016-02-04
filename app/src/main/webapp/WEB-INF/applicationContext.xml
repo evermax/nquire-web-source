@@ -6,6 +6,24 @@
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="/WEB-INF/nquireit.properties"/>
+        <property name="searchSystemEnvironment" value="true" />
+    </bean>
+    
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5" />
+        <property name="maxPoolSize" value="10" />
+        <property name="queueCapacity" value="25" />
+    </bean>
+    
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="org.greengin.nquireit.logic.mail.Mailer.setSMTPServer"/>
+        <property name="arguments">
+            <list>
+                <value>${mail.smtpHost}</value>
+                <value>${mail.sender}</value>
+                <value>${mail.name}</value>
+            </list>
+       </property>
     </bean>
 
     <import resource="nquireit.xml"/>

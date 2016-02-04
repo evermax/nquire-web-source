@@ -103,18 +103,25 @@ public class ForumManager extends AbstractContentManager {
             ForumThread thread = context.getForumDao().findThread(threadId);
             context.getForumDao().comment(user, thread, data);
 
-            Mailer mailer = new Mailer();
-            mailer.sendMail(
-                "New forum post - " + thread.getTitle(),
-                "Hello nQuire-it user,\n\n" +
-                "A new post has been made on the nQuire-it forum '" + thread.getTitle() + "':\n" +
-                "http://www.nquire-it.org/#/forum/thread/" + thread.getId() + "\n\n" +
-                "To stop receiving these messages, update your notification preferences at:\n" +
-                "http://www.nquire-it.org/#/profile\n\n" +
-                "Warm regards,\nnQuire-it team",
-                context.getUserProfileDao().forumNotifications(thread.getId(), user.getId()),
-                true
-            );
+            final String threadTitle = thread.getTitle();
+            final String thrId = thread.getId().toString();
+            final List<UserProfile> notifications = context.getUserProfileDao().forumNotifications(thread.getId(), user.getId());
+            context.getTaskExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    Mailer.sendMail(
+                        "New forum post - " + threadTitle,
+                        "Hello nQuire-it user,\n\n" +
+                        "A new post has been made on the nQuire-it forum '" + threadTitle + "':\n" +
+                        "http://www.nquire-it.org/#/forum/thread/" + thrId + "\n\n" +
+                        "To stop receiving these messages, update your notification preferences at:\n" +
+                        "http://www.nquire-it.org/#/profile\n\n" +
+                        "Warm regards,\nnQuire-it team",
+                        notifications,
+                        true
+                    );
+                }
+            });
 
             return thread;
         }
@@ -151,19 +158,25 @@ public class ForumManager extends AbstractContentManager {
                 Comment comment = context.getCommentsDao().getComment(thread, commentId);
                 if (comment != null) {
                     if (voteData.isReport()) {
-                        Mailer mailer = new Mailer();
-                        mailer.sendMail(
-                            "Inappropriate content reported",
-                            "Hello nQuire-it administrator,\n\n" +
-                            "Inappropriate content has been reported on the nQuire-it website.\n\n" +
-                            "Please review the reports and take appropriate action.\n\n" +
-                            this.appUrl + "/#/admin/reported\n\n" +
-                            "This is an automatically generated e-mail sent to all administrators.  " +
-                            "To stop receiving these messages, arrange for your administrator status to be revoked.\n\n" +
-                            "Warm regards,\nnQuire-it team",
-                            context.getUserProfileDao().listAdmins(),
-                            false
-                        );
+                        final String url = this.appUrl;
+                        final List<UserProfile> notifications = context.getUserProfileDao().listAdmins();
+                        context.getTaskExecutor().execute( new Runnable() {
+                            @Override
+                            public void run() {
+                                Mailer.sendMail(
+                                    "Inappropriate content reported",
+                                    "Hello nQuire-it administrator,\n\n" +
+                                    "Inappropriate content has been reported on the nQuire-it website.\n\n" +
+                                    "Please review the reports and take appropriate action.\n\n" +
+                                    url + "/#/admin/reported\n\n" +
+                                    "This is an automatically generated e-mail sent to all administrators.  " +
+                                    "To stop receiving these messages, arrange for your administrator status to be revoked.\n\n" +
+                                    "Warm regards,\nnQuire-it team",
+                                    notifications,
+                                    false
+                                );
+                            }
+                        });
                     }
                     return context.getVoteDao().vote(user, comment, voteData);
                 }

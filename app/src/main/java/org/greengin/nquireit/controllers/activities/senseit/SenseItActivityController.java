@@ -1,18 +1,25 @@
 package org.greengin.nquireit.controllers.activities.senseit;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.greengin.nquireit.entities.projects.Project;
+import org.greengin.nquireit.entities.users.UserProfile;
 import org.greengin.nquireit.logic.mail.Mailer;
 import org.greengin.nquireit.logic.project.ProjectResponse;
 import org.greengin.nquireit.logic.project.senseit.SensorInputRequest;
 import org.greengin.nquireit.logic.project.senseit.SenseItProfileRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(value = "/api/project/{projectId}/senseit")
 public class SenseItActivityController extends AbstractSenseItController {
+    
+    @Autowired
+    TaskExecutor taskExecutor;
 
 
     @RequestMapping(value = "/profile", method = RequestMethod.PUT)
@@ -27,18 +34,25 @@ public class SenseItActivityController extends AbstractSenseItController {
 
         Project project = context.getProjectDao().project(projectId);
 
-        Mailer mailer = new Mailer();
-        mailer.sendMail(
-            "New mission data - " + project.getTitle(),
-            "Hello nQuire-it user,\n\n" +
-            "New data has been added to the nQuire-it mission '" + project.getTitle() + "':\n" +
-            "http://www.nquire-it.org/#/project/" + projectId + "/data\n\n" +
-            "To stop receiving these messages, update your notification preferences at:\n" +
-            "http://www.nquire-it.org/#/profile\n\n" +
-            "Warm regards,\nnQuire-it team",
-            context.getUserProfileDao().projectNotifications(projectId),
-            false
-        );
+        final String projectTitle = project.getTitle();
+        final String projId = projectId.toString();
+        final List<UserProfile> notifications = context.getUserProfileDao().projectNotifications(projectId);
+        this.taskExecutor.execute( new Runnable() {
+            @Override
+            public void run() {
+                Mailer.sendMail(
+                    "New mission data - " + projectTitle,
+                    "Hello nQuire-it user,\n\n" +
+                    "New data has been added to the nQuire-it mission '" + projectTitle + "':\n" +
+                    "http://www.nquire-it.org/#/project/" + projId + "/data\n\n" +
+                    "To stop receiving these messages, update your notification preferences at:\n" +
+                    "http://www.nquire-it.org/#/profile\n\n" +
+                    "Warm regards,\nnQuire-it team",
+                    notifications,
+                    false
+                );
+            }
+        });
 
         return createManager(projectId, request).createSensor(inputData);
 	}

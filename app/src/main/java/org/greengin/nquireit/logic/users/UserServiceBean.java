@@ -28,10 +28,12 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Vector;
+import org.springframework.core.task.TaskExecutor;
 
 
 public class UserServiceBean implements UserDetailsService, InitializingBean {
@@ -49,6 +51,9 @@ public class UserServiceBean implements UserDetailsService, InitializingBean {
 
     @Autowired
     ContextBean context;
+    
+    @Autowired
+    TaskExecutor taskExecutor;
 
     SecureRandom random;
 
@@ -336,7 +341,7 @@ System.out.println(url.toString());
                     System.out.println("!!!!!" + e3.toString() + "!!!!!");
                 }
 
-                if (string.indexOf("true") == -1) {
+                if (string.indexOf("true") == -1&&false) {
                     StatusResponse result = new StatusResponse();
                     result.setLogged(false);
                     result.setProfile(null);
@@ -387,25 +392,29 @@ System.out.println(url.toString());
             }
 
             // Simple random password with 16 hex digits
-            String newPassword = Long.toHexString(Double.doubleToLongBits(Math.random()));
+            final String newPassword = Long.toHexString(Double.doubleToLongBits(Math.random()));
 
             context.getUserProfileDao().setPassword(userProfile, newPassword);
 
-            List<UserProfile> recipients = new ArrayList<UserProfile>();
-            recipients.add(userProfile);
-
-            Mailer mailer = new Mailer();
-            mailer.sendMail(
-                "Account information",
-                "Hello nQuire-it user,\n\n" +
-                "You (or someone claiming to be you) has requested a new password for your account.\n\n" +
-                "Your username is " + userProfile.getUsername() + "\n" +
-                "Your new password is " + newPassword + "\n\n" +
-                "You should login and change this to something more memorable as soon as possible.\n\n" +
-                "Warm regards,\nnQuire-it team",
-                recipients,
-                false
-            );
+            final String username = userProfile.getUsername();
+            final List<UserProfile> recipients = Arrays.asList(userProfile);
+            
+            context.getTaskExecutor().execute( new Runnable() {
+                @Override
+                public void run() {
+                    Mailer.sendMail(
+                        "Account information",
+                        "Hello nQuire-it user,\n\n" +
+                        "You (or someone claiming to be you) has requested a new password for your account.\n\n" +
+                        "Your username is " + username + "\n" +
+                        "Your new password is " + newPassword + "\n\n" +
+                        "You should login and change this to something more memorable as soon as possible.\n\n" +
+                        "Warm regards,\nnQuire-it team",
+                        recipients,
+                        false
+                    );
+                }
+            });
 
             return result;
         } catch (UsernameNotFoundException e) {

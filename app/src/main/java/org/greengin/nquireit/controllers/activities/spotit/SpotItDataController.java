@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import org.greengin.nquireit.entities.users.UserProfile;
+import org.springframework.core.task.TaskExecutor;
 
 @Controller
 @RequestMapping(value = "/api/project/{projectId}/spotit/data")
@@ -41,6 +43,9 @@ public class SpotItDataController {
 
     @Autowired
     JacksonObjectMapper objectMapper;
+    
+    @Autowired
+    TaskExecutor taskExecutor;
 
     protected SpotItActivityActions createManager(Long projectId, HttpServletRequest request) {
         return new SpotItActivityActions(context, projectId, request);
@@ -95,18 +100,25 @@ public class SpotItDataController {
 
             Project project = context.getProjectDao().project(projectId);
 
-            Mailer mailer = new Mailer();
-            mailer.sendMail(
-                "New mission observation - " + project.getTitle(),
-                "Hello nQuire-it user,\n\n" +
-                "A new observation has been added to the nQuire-it mission '" + project.getTitle() + "':\n" +
-                "http://www.nquire-it.org/#/project/" + projectId + "/data\n\n" +
-                "To stop receiving these messages, update your notification preferences at:\n" +
-                "http://www.nquire-it.org/#/profile\n\n" +
-                "Warm regards,\nnQuire-it team",
-                context.getUserProfileDao().projectNotifications(projectId),
-                false
-            );
+            final List<UserProfile> notifications = context.getUserProfileDao().projectNotifications(projectId);
+            final String projectTitle = project.getTitle();
+            final String projId = projectId.toString();
+            this.taskExecutor.execute( new Runnable(){
+                @Override
+                public void run() {
+                    Mailer.sendMail(
+                        "New mission observation - " + projectTitle,
+                        "Hello nQuire-it user,\n\n" +
+                        "A new observation has been added to the nQuire-it mission '" + projectTitle + "':\n" +
+                        "http://www.nquire-it.org/#/project/" + projId + "/data\n\n" +
+                        "To stop receiving these messages, update your notification preferences at:\n" +
+                        "http://www.nquire-it.org/#/profile\n\n" +
+                        "Warm regards,\nnQuire-it team",
+                        notifications,
+                        false
+                    );
+                }
+            });
 
             return createManager(projectId, request).createData(new SpotItObservationManipulator(context, requestData, file, null));
         } catch (IOException e) {
