@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.scheduling.annotation.Async;
 
 /**
@@ -26,7 +27,7 @@ public class Mailer {
     @Async
     public static boolean sendMail(String subject, String message, List<UserProfile> recipients, boolean useBcc) {
         if (recipients.isEmpty()) {
-            System.out.println("Sending message '" + subject + "' - but no recipients!");
+            LogManager.getLogger(Mailer.class).warn("Sending message '" + subject + "' - but no recipients!");
             return true;
         }
 
@@ -43,12 +44,12 @@ public class Mailer {
 
             for(UserProfile recipient: recipients) {
                 if (recipient.getEmail().isEmpty()) {
-                  System.out.println("User " + recipient.getUsername() + " does not have an email address");
+                    LogManager.getLogger(Mailer.class).warn("User " + recipient.getUsername() + " does not have an email address");
                 } else if (useBcc) {
-                  System.out.println("BCC: " + recipient.getEmail());
+                    System.out.println("BCC: " + recipient.getEmail());
                     msg.addRecipient(MimeMessage.RecipientType.BCC, new InternetAddress(recipient.getEmail(),recipient.getUsername()));
                 } else {
-                  System.out.println("To: " + recipient.getEmail());
+                    System.out.println("To: " + recipient.getEmail());
                     msg.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail(),recipient.getUsername()));
                 }
             }
@@ -57,10 +58,10 @@ public class Mailer {
             Transport.send(msg);
             return true;
         } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
+            LogManager.getLogger(Mailer.class).error("An error occured while sending an email: " + ex);
             return false;
         } catch (MessagingException ex) {
-            ex.printStackTrace();
+            LogManager.getLogger(Mailer.class).error("An error occured while sending an email: " + ex);
             return false;
         }
     }

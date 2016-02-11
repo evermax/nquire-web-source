@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="warn" packages="org.apache.logging.log4j.core,net.kencochrane.raven.log4j2">
+    <appenders>
+        <Raven name="Sentry">
+            <dsn>
+                http://${env:SENTRY_PUBLIC_KEY}:${env:SENTRY_SECRET_KEY}@${env:SENTRY_ADDR}:${env:SENTRY_PORT}/${env:SENTRY_NUMBER}
+            </dsn>
+            <tags>
+                spring:4,nquire:web
+            </tags>
+            <!--
+                Optional, allows to select the ravenFactory
+            -->
+            <!--
+            <ravenFactory>
+                net.kencochrane.raven.DefaultRavenFactory
+            </ravenFactory>
+            -->
+        </Raven>
+    </appenders>
+
+    <loggers>
+        <root level="all">
+            <appender-ref ref="Sentry"/>
+        </root>
+    </loggers>
+</configuration>

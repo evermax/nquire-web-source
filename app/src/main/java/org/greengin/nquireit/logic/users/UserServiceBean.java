@@ -27,12 +27,12 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.core.task.TaskExecutor;
 
 
@@ -338,7 +338,7 @@ System.out.println(url.toString());
                     }
                     scanner.close();
                 } catch (java.io.IOException e3) {
-                    System.out.println("!!!!!" + e3.toString() + "!!!!!");
+                    LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha: " + e3);
                 }
 
                 if (string.indexOf("true") == -1&&false) {
@@ -423,7 +423,7 @@ System.out.println(url.toString());
             result.getResponses().put("reminder", "email_not_exists");
             return result;
         } catch (java.io.IOException e3) {
-            System.out.println("!!!!!" + e3.toString() + "!!!!!");
+            LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha: " + e3);
             result.setLogged(false);
             result.setProfile(null);
             result.getResponses().put("reminder", "bad_recaptcha");
