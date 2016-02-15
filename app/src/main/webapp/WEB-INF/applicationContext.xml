@@ -16,10 +16,14 @@
     </bean>
     
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="staticMethod" value="org.greengin.nquireit.logic.mail.Mailer.setSMTPServer"/>
+        <property name="staticMethod" value="org.greengin.nquireit.utils.AppDetails.setAppDetails"/>
         <property name="arguments">
             <list>
-                <value>${mail.smtpHost}</value>
+                <value>${app.url}</value>
+                <value>http://${LRS_PORT_8080_TCP_ADDR}:${LRS_PORT_8080_TCP_PORT}/xAPI</value>
+                <value>${LRS_ADMIN_NAME}</value>
+                <value>${LRS_ADMIN_PASS}</value>
+                <value>${MAIL_PORT_25_TCP_ADDR}</value>
                 <value>${mail.sender}</value>
                 <value>${mail.name}</value>
             </list>

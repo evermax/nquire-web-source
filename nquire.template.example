@@ -1,0 +1,43 @@
+  server { # nquire
+    listen       80;
+    server_name  example.com;
+    access_log   /logs/main.access.log  main;
+    index index.html;
+    root         /nquire;
+    location / {
+      autoindex on;
+      alias   /nquire/;
+    }
+    location /api {
+      proxy_pass      http://${NQUIRE_PORT_8080_TCP_ADDR}:${NQUIRE_PORT_8080_TCP_PORT};
+    }
+    location /lrs {
+      proxy_pass      http://${NQUIRE_PORT_8080_TCP_ADDR}:${NQUIRE_PORT_8080_TCP_PORT};
+    }
+    location /spring_security_login {
+      proxy_pass      http://${NQUIRE_PORT_8080_TCP_ADDR}:${NQUIRE_PORT_8080_TCP_PORT};
+    }
+    location /social {
+      proxy_pass      http://${NQUIRE_PORT_8080_TCP_ADDR}:${NQUIRE_PORT_8080_TCP_PORT};
+    }
+  }
+
+  server { # sentry
+    listen       80;
+    server_name  sentry.example.com;
+    access_log   /logs/sentry.access.log  main;
+
+    location / {
+      proxy_pass      http://${SENTRY_PORT_9000_TCP_ADDR}:${SENTRY_PORT_9000_TCP_PORT};
+    }
+  }
+
+  server { #lrs
+    listen      80;
+    server_name lrs.example.com;
+    access_log  /logs/lrs.access.log  main;
+
+    location / {
+      proxy_pass    http://${LRS_PORT_8080_TCP_ADDR}:${LRS_PORT_8080_TCP_PORT};
+    }
+  }

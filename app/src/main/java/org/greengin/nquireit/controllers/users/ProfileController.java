@@ -48,7 +48,7 @@ public class ProfileController {
     @Qualifier("twitter")
     Connection<Twitter> twitter;
 
-    @Value("${server.appUrl}")
+    @Value("${app.url}")
     String serverPath;
 
 

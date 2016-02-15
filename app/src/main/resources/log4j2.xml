@@ -3,7 +3,7 @@
     <appenders>
         <Raven name="Sentry">
             <dsn>
-                http://${env:SENTRY_PUBLIC_KEY}:${env:SENTRY_SECRET_KEY}@${env:SENTRY_ADDR}:${env:SENTRY_PORT}/${env:SENTRY_NUMBER}
+                http://${env:SENTRY_INITIAL_KEY}@${env:SENTRY_PORT_9000_TCP_ADDR}:${env:SENTRY_PORT_9000_TCP_PORT}/2
             </dsn>
             <tags>
                 spring:4,nquire:web
@@ -20,8 +20,11 @@
     </appenders>
 
     <loggers>
-        <root level="all">
+        <root level="error">
             <appender-ref ref="Sentry"/>
         </root>
+        <logger name="org.hibernate" level="error">
+            <appender-ref ref="Sentry"/>
+        </logger>
     </loggers>
 </configuration>

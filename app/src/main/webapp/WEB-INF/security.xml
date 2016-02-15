@@ -93,10 +93,10 @@
     </bean>
 
     <bean class="org.greengin.nquireit.controllers.users.CustomProviderSignInController2">
-        <property name="applicationUrlBase" value="${server.appUrl}"/>
-        <property name="signUpUrl" value="${server.appUrl}/social/new"/>
-        <property name="signInUrl" value="${server.appUrl}/social/signin"/>
-        <property name="postSignInUrl" value="${server.appUrl}/social/welcome"/>
+        <property name="applicationUrlBase" value="${app.url}"/>
+        <property name="signUpUrl" value="${app.url}/social/new"/>
+        <property name="signInUrl" value="${app.url}/social/signin"/>
+        <property name="postSignInUrl" value="${app.url}/social/welcome"/>
     </bean>
 
 </beans>

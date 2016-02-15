@@ -8,21 +8,13 @@ import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 import org.apache.logging.log4j.LogManager;
+import org.greengin.nquireit.utils.AppDetails;
 import org.springframework.scheduling.annotation.Async;
 
 /**
  * Send a message to multiple recipients.
  */
 public class Mailer {
-    private static String smtpHost;
-    private static String sender;
-    private static String name;
-    
-    public static void setSMTPServer(String smtpServer, String sender, String name) {
-        Mailer.smtpHost = smtpServer;
-        Mailer.sender = sender;
-        Mailer.name = name;
-    }
 
     @Async
     public static boolean sendMail(String subject, String message, List<UserProfile> recipients, boolean useBcc) {
@@ -32,14 +24,14 @@ public class Mailer {
         }
 
         try {
-            System.out.println("Sending mail via SMTP host " + smtpHost);
+            System.out.println("Sending mail via SMTP host " + AppDetails.MAIL_SMTP_HOST);
             Properties properties = new Properties();
-            properties.put("mail.smtp.host", Mailer.smtpHost);
+            properties.put("mail.smtp.host", AppDetails.MAIL_SMTP_HOST);
             Session session = Session.getInstance(properties, null);
             session.setDebug(true);
             MimeMessage msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(Mailer.sender, Mailer.name));
-            msg.setSubject("[" + Mailer.name + "] " + subject);
+            msg.setFrom(new InternetAddress(AppDetails.MAIL_SENDER, AppDetails.MAIL_NAME));
+            msg.setSubject("[" + AppDetails.MAIL_NAME + "] " + subject);
             msg.setText(message);
 
             for(UserProfile recipient: recipients) {

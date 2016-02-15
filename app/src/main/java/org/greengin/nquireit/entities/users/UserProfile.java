@@ -1,11 +1,9 @@
 package org.greengin.nquireit.entities.users;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.greengin.nquireit.entities.AbstractEntity;
 import org.greengin.nquireit.logic.ContextBean;
-import org.greengin.nquireit.utils.TimeValue;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,7 +11,6 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 @Entity
 public class UserProfile extends AbstractEntity implements UserDetails {

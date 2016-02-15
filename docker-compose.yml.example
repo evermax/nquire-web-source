@@ -1,0 +1,100 @@
+nginx:
+  image: nginx
+  volumes:
+   - ./nquire.template:/etc/nginx/conf.d/nquire.template
+   - ./static/src:/nquire
+   - /logs
+  ports:
+    - "80:80"
+    - "443:443"
+  links:
+    - nquire
+    - sentry
+    - lrs
+  command: /bin/bash -c "envsubst < /etc/nginx/conf.d/nquire.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+
+nquire:
+  image: dirichlet/glassfish
+  volumes:
+    - ./app/target/nquire-it.war:/project/nquire-it.war
+  links:
+    - lrs
+    - mysql
+    - sentry
+    - mail
+  env_file:
+    - mysql.env
+    - lrs.env
+    - sentry.env
+  command: nquire-it.war
+
+mysql:
+  image: mysql/mysql-server
+  env_file: mysql.env
+  volumes_from:
+    - mysql_data
+
+mail:
+  image: tvial/docker-mailserver
+  hostname: mail
+  domainname: example.com
+  # the FQDN will be 'mail.example.com'
+  ports:
+    - "25:25"
+    - "143:143"
+    - "587:587"
+    - "993:993"
+  volumes:
+    - ./spamassassin:/tmp/spamassassin/
+    - ./postfix:/tmp/postfix/
+  volumes_from:
+    - mail_data
+
+# LRS and dependencies
+lrs:
+  image: dirichlet/lrs
+  links:
+    - postgres
+    - rabbitmq
+  env_file:
+    - lrs.env
+    - psql.env
+    - rabbitmq.env
+
+rabbitmq:
+  image: rabbitmq:3.6
+  env_file: rabbitmq.env
+  privileged: true
+
+# Sentry and dependencies
+sentry:
+  image: slafs/sentry
+  links:
+    - redis
+    - postgres
+  env_file:
+    - psql.env
+    - sentry.env
+  # volumes:
+  #   - /tmp/sentry:/data
+#
+# sentry_celery_worker:
+#   image: slafs/sentry
+#   links:
+#     - redis
+#     - postgres
+#   env_file:
+#     - psql.env
+#     - sentry.env
+#   volumes:
+#     - /tmp/sentry:/data
+#   command: celery worker -B
+
+redis:
+  image: redis
+# postgres for both lrs and sentry
+postgres:
+  image: postgres
+  env_file: psql.env
+  volumes_from:
+    - psql_data

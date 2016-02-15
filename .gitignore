@@ -16,3 +16,9 @@ static/src/js/app/min/
 
 *BAK*
 *copy*
+
+*.env
+docker-compose.yml
+postfix/
+spamassassin/
+
