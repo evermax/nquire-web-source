@@ -15,6 +15,108 @@ The structure of the project is now the following:
 
 The work on the app Sense-it will be published on a fork of the corresponding repo, but the main change will be to add the French translation, as all the changes about LRS communications will be on the API side.
 
+### Commands
+
+#### Setup
+
+Clone the directory, rename all the files with .example by removing the `.example` extension.
+
+Fill in the files with `.env` extension.
+
+- `mysql.env` contains all the informations about the MySQL database (used by nquire as well):
+	- `MYSQL_ROOT_PASSWORD`: MySQL root password
+	- `MYSQL_USER`: MySQL username that will be created to avoid using root user.
+	- `MYSQL_PASSWORD`: MySQL password for the previous user.
+	- `MYSQL_DATABASE`: The name of the database to be created. The create will have full access for the created user.
+- `psql.env` contains all the informations about the PostgreSQL database:
+	- `POSTGRES_USER`: The user to be created.
+	- `POSTGRES_PASSWORD`: The password for this user.
+	- `PGDATA=/var/lib/postgresql/data/pgdata`: It is recommended not to use the default path to store the psql database info.
+	- `POSTGRES_DB=lrs`: Another database to be create in addition to `postgres`. The name should stay the same for the LRS part to work.
+- `lrs.env` environment variables for the LRS image:
+	- `LRS_ADMIN_NAME`: Admin name
+	- `LRS_ADMIN_PASS`: Admin password
+	- `LRS_ADMIN_MAIL`: Admin mail
+	- `LRS_SECRET_KEY`: Some long random string with numb3rs and $ymbol$
+- `rabbit.env` environment variables for the rabbitmq image (used by the LRS as well):
+	- `RABBITMQ_DEFAULT_USER`: Rabbitmq name
+	- `RABBITMQ_DEFAULT_PASS`: Rabbitmq password
+- `sentry.env` 
+	- `SECRET_KEY`
+	- `SENTRY_URL_PREFIX`: http://example.com, this must be the url after proxying.
+	- `DATABASE_URL`: postgres://user:pwd@postgres/dbname
+	- `SENTRY_ADMIN_USERNAME` Admin username
+	- `SENTRY_ADMIN_PASSWORD` Admin password
+	- `SENTRY_ADMIN_EMAIL` Admin email
+	- `SENTRY_INITIAL_TEAM` Name of the team to be displayed on Sentry
+	- `SENTRY_INITIAL_PROJECT` Name of the project to be displayed on Sentry
+	- `SENTRY_INITIAL_KEY` publickey:secretkey
+	- `SENTRY_USE_REDIS_TSDB` leave this value to True or check [the repo of the image](https://github.com/slafs/sentry-docker)
+
+#### Create the data volume containers:
+
+ - MySQL :
+
+```
+docker create --name mysql_data -v /var/lib/mysql busybox
+```
+
+ - PostgreSQL :
+
+```
+docker create --name psql_data -v /var/lib/postgresql/data/pgdata busybox
+```
+
+ - Mail server :
+
+```
+docker create --name mail_data -v /var/mail busybox
+
+
+#### Launch the project
+
+```
+docker-compose up -d
+```
+
+Un long processus va se lancer, il faut donc être patient avant de penser que ça ne marche pas.
+Étant donné que la partie `nquire` dépend de tous les autres modules, ce sera le dernier à se lancer. Ainsi consulter ses logs en faisant `docker-compose log nquire` est un bon moyen de savoir où le lancement du projet en est.
+
+Si Sentry ou le LRS posent problème, le mieux et de faire : `docker-compose down`
+
+Et de relancer à nouveau : `docker-compose up -d`
+```
+
+#### Make backups of the data volume containers:
+
+This is quite important in order not to loose your data.
+
+whe can image having those scripts in a cron script.
+
+```
+docker run --rm \
+--volumes-from mysql_data \
+-v "$(pwd)":/backups \
+-ti ubuntu \
+tar cvzf /backups/docker-mysql-`date +%y%m%d-%H%M%S`.tgz /var/lib/mysql
+```
+
+```
+docker run --rm \
+--volumes-from psql_data \
+-v "$(pwd)":/backups \
+-ti ubuntu \
+tar cvzf /backups/docker-psql-`date +%y%m%d-%H%M%S`.tgz /var/lib/postgresql/data/pgdata
+```
+
+```
+docker run --rm \
+--volumes-from mail_data \
+-v "$(pwd)":/backups \
+-ti ubuntu \
+tar cvzf /backups/docker-mailserver-`date +%y%m%d-%H%M%S`.tgz /var/mail
+```
+
 Description
 -----------
 
