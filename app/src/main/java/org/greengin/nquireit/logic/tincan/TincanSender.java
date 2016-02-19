@@ -180,7 +180,7 @@ public class TincanSender {
             LogManager.getLogger(TincanSender.class).error("An error occured while putting the following record:\nAgent: "
                     + statement.getActor()
                     + "\nVerb: " + statement.getVerb()
-                    + "\nActivity: " + statement.getObject() + "\nError: " + e);
+                    + "\nActivity: " + statement.getObject(), e);
         }
     }
 }

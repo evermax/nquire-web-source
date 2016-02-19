@@ -338,7 +338,7 @@ System.out.println(url.toString());
                     }
                     scanner.close();
                 } catch (java.io.IOException e3) {
-                    LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha: " + e3);
+                    LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha", e3);
                 }
 
                 if (string.indexOf("true") == -1&&false) {
@@ -423,7 +423,7 @@ System.out.println(url.toString());
             result.getResponses().put("reminder", "email_not_exists");
             return result;
         } catch (java.io.IOException e3) {
-            LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha: " + e3);
+            LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha", e3);
             result.setLogged(false);
             result.setProfile(null);
             result.getResponses().put("reminder", "bad_recaptcha");

@@ -50,10 +50,10 @@ public class Mailer {
             Transport.send(msg);
             return true;
         } catch (UnsupportedEncodingException ex) {
-            LogManager.getLogger(Mailer.class).error("An error occured while sending an email: " + ex);
+            LogManager.getLogger(Mailer.class).error("An error occured while sending an email", ex);
             return false;
         } catch (MessagingException ex) {
-            LogManager.getLogger(Mailer.class).error("An error occured while sending an email: " + ex);
+            LogManager.getLogger(Mailer.class).error("An error occured while sending an email", ex);
             return false;
         }
     }
