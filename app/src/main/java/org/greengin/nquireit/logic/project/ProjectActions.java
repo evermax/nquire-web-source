@@ -16,6 +16,7 @@ import org.greengin.nquireit.logic.rating.VoteRequest;
 import org.greengin.nquireit.logic.users.AccessLevel;
 import org.greengin.nquireit.logic.files.FileMapUpload;
 import org.greengin.nquireit.logic.rating.CommentRequest;
+import org.greengin.nquireit.logic.tincan.TincanSender;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,8 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 
 public class ProjectActions extends AbstractContentManager {
 
@@ -239,6 +238,15 @@ public class ProjectActions extends AbstractContentManager {
             context.getSubscriptionManager().subscribe(user, project, RoleType.MEMBER);
             context.getProjectDao().updateActivityTimestamp(project);
             context.getLogManager().projectMembershipAction(user, project, true);
+            
+            final UserProfile usr = user;
+            final String id = projectId.toString();
+            context.getTaskExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    TincanSender.StoreJoinProject(usr, id);
+                }
+            });
             return context.getSubscriptionManager().getAccessLevel(project, user);
         }
         return null;
@@ -249,6 +257,15 @@ public class ProjectActions extends AbstractContentManager {
             context.getSubscriptionManager().unsubscribe(user, project, RoleType.MEMBER);
             context.getProjectDao().updateActivityTimestamp(project);
             context.getLogManager().projectMembershipAction(user, project, false);
+            
+            final UserProfile usr = user;
+            final String id = projectId.toString();
+            context.getTaskExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    TincanSender.StoreLeaveProject(usr, id);
+                }
+            });
             return context.getSubscriptionManager().getAccessLevel(project, user);
         }
 
@@ -259,6 +276,24 @@ public class ProjectActions extends AbstractContentManager {
         if (hasAccess(PermissionType.PROJECT_ADMIN)) {
             context.getProjectDao().setOpen(project, open);
             context.getProjectDao().updateActivityTimestamp(project);
+            
+            final UserProfile usr = user;
+            final String id = projectId.toString();
+            if (open) {
+                context.getTaskExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        TincanSender.StoreOpenProject(usr, id);
+                    }
+                });
+            } else {
+                context.getTaskExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        TincanSender.StoreCloseProject(usr, id);
+                    }
+                });
+            }
             return projectResponse(project);
         }
 
@@ -343,6 +378,15 @@ public class ProjectActions extends AbstractContentManager {
                         notifications,
                         true
                     );
+                }
+            });
+            
+            final UserProfile usr = user;
+            final String comment = request.getComment();
+            context.getTaskExecutor().execute( new Runnable() {
+                @Override
+                public void run() {
+                    TincanSender.StoreCommentProject(usr, projId, comment);
                 }
             });
 

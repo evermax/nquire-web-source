@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
 
 public abstract class DataActions<E extends AbstractDataProjectItem, F extends AbstractDataProjectItem, T extends DataCollectionActivity<E, F>>
         extends AbstractActivityActions<T> {
@@ -74,7 +75,7 @@ public abstract class DataActions<E extends AbstractDataProjectItem, F extends A
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                LogManager.getLogger(DataActions.class).error(e);
             }
         }
 

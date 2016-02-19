@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.apache.logging.log4j.LogManager;
 
 
 @Service
@@ -180,7 +181,7 @@ public class FileManagerBean implements InitializingBean {
             ImageIO.write(image2, extension, imagefile);
             deleteThumb("/" + filename);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogManager.getLogger(FileManagerBean.class).error(e);
         }
     }
 

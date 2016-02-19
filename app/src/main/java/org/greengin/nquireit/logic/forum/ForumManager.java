@@ -15,6 +15,7 @@ import org.greengin.nquireit.logic.rating.VoteRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Vector;
+import org.greengin.nquireit.logic.tincan.TincanSender;
 
 /**
  * Created by evilfer on 6/26/14.
@@ -80,6 +81,16 @@ public class ForumManager extends AbstractContentManager {
         if (loggedWithToken) {
             ForumThread thread = context.getForumDao().createThread(user, forumId, forumData);
             if (thread != null) {
+                final UserProfile usr = user;
+                final Long id = forumId;
+                final Long threadId = thread.getId();
+                final String title = thread.getTitle();
+                context.getTaskExecutor().execute( new Runnable() {
+                    @Override
+                    public void run() {
+                        TincanSender.StoreCreateForumThread(usr, id, threadId, title);
+                    }
+                });
                 return thread.getId();
             }
         }
@@ -102,7 +113,7 @@ public class ForumManager extends AbstractContentManager {
             context.getForumDao().comment(user, thread, data);
 
             final String threadTitle = thread.getTitle();
-            final String thrId = thread.getId().toString();
+            final Long thrId = thread.getId();
             final List<UserProfile> notifications = context.getUserProfileDao().forumNotifications(thread.getId(), user.getId());
             context.getTaskExecutor().execute(new Runnable() {
                 @Override
@@ -118,6 +129,15 @@ public class ForumManager extends AbstractContentManager {
                         notifications,
                         true
                     );
+                }
+            });
+            
+            final UserProfile usr = user;
+            final String comment = data.getComment();
+            context.getTaskExecutor().execute( new Runnable() {
+                @Override
+                public void run() {
+                    TincanSender.StoreCommentForumThread(usr, thrId, comment);
                 }
             });
 

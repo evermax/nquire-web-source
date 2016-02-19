@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
+import org.apache.logging.log4j.LogManager;
 
 import org.greengin.nquireit.logic.project.senseit.transformations.SenseItProcessedSeriesVariable;
 import org.greengin.nquireit.utils.TimeValue;
@@ -105,7 +106,7 @@ public class SenseItPlots {
             ChartUtilities.writeBufferedImageAsPNG(bas, objBufferedImage, true, 0);
             return bas.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            LogManager.getLogger(SenseItPlots.class).error(e);
             return null;
         }
 

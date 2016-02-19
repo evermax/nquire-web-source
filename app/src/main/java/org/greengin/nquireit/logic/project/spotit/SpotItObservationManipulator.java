@@ -12,6 +12,7 @@ import org.greengin.nquireit.logic.files.FileMapUpload;
 
 import java.io.File;
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
 
 public class SpotItObservationManipulator extends DataItemManipulator<SpotItActivity, SpotItObservation> {
 
@@ -38,7 +39,7 @@ public class SpotItObservationManipulator extends DataItemManipulator<SpotItActi
                 Directory directory = metadata.getDirectory(ExifIFD0Directory.class);
                 orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
             } catch (Exception e) {
-                e.printStackTrace();
+                LogManager.getLogger(SpotItObservationManipulator.class).error(e);
             }
 
             context.getFileManager().imageInitialRotation(filename, orientation);

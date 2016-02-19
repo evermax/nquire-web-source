@@ -10,22 +10,23 @@ import org.greengin.nquireit.logic.project.ProjectCreationRequest;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
 
 public class DbHelper {
 
     private final String userConnectionTableDrop = "DROP TABLE IF EXISTS UserConnection;";
-    private final String userConnectionTableCreate = "create table UserConnection (userId varchar(255) not null,\n" +
-            "\tproviderId varchar(255) not null,\n" +
-            "\tproviderUserId varchar(255),\n" +
-            "\trank int not null,\n" +
-            "\tdisplayName varchar(255),\n" +
-            "\tprofileUrl varchar(512),\n" +
-            "\timageUrl varchar(512),\n" +
-            "\taccessToken varchar(255) not null,\n" +
-            "\tsecret varchar(255),\n" +
-            "\trefreshToken varchar(255),\n" +
-            "\texpireTime bigint,\n" +
-            "\tprimary key (userId, providerId, providerUserId));";
+    private final String userConnectionTableCreate = "create table UserConnection (userId varchar(255) not null,\n"
+            + "\tproviderId varchar(255) not null,\n"
+            + "\tproviderUserId varchar(255),\n"
+            + "\trank int not null,\n"
+            + "\tdisplayName varchar(255),\n"
+            + "\tprofileUrl varchar(512),\n"
+            + "\timageUrl varchar(512),\n"
+            + "\taccessToken varchar(255) not null,\n"
+            + "\tsecret varchar(255),\n"
+            + "\trefreshToken varchar(255),\n"
+            + "\texpireTime bigint,\n"
+            + "\tprimary key (userId, providerId, providerUserId));";
     private final String userConnectionTableIndex = "create unique index UserConnectionRank on UserConnection(userId, providerId, rank);";
 
     ContextBean context;
@@ -57,12 +58,12 @@ public class DbHelper {
                             em.remove(entity);
                             em.getTransaction().commit();
                         } catch (Exception exception) {
-                            exception.printStackTrace();
+                            LogManager.getLogger(DbHelper.class).error(exception);
                             em.getTransaction().rollback();
                         }
                     }
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    LogManager.getLogger(DbHelper.class).error(exception);
                 }
             }
         }
@@ -94,7 +95,6 @@ public class DbHelper {
         Long id = actions.createProject(projectRequest);
         return em.find(Project.class, id);
     }
-
 
     public List<UserProfile> users() {
         return em.createQuery("SELECT u from UserProfile u", UserProfile.class).getResultList();

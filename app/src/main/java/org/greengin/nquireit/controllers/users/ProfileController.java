@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import com.mangofactory.jsonview.ResponseView;
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.logging.log4j.LogManager;
 import org.greengin.nquireit.entities.users.UserProfile;
 import org.greengin.nquireit.json.Views;
 import org.greengin.nquireit.logic.ContextBean;
@@ -113,7 +114,7 @@ public class ProfileController {
             boolean completed = new UserProfileActions(context, request).updateProfileImage(response, files);
             return completed ? response : null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LogManager.getLogger(ProfileController.class).error("Error while updating the profile image", e);
         }
 
         return null;

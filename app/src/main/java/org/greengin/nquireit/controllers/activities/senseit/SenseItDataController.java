@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import org.apache.logging.log4j.LogManager;
 
 @Controller
 @RequestMapping(value = "/api/project/{projectId}/senseit/data")
@@ -88,7 +89,7 @@ public class SenseItDataController extends AbstractSenseItController {
 
             pw.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LogManager.getLogger(SenseItDataController.class).error("Error while getting the CSV", e);
         }
     }
 
@@ -136,7 +137,7 @@ public class SenseItDataController extends AbstractSenseItController {
         try {
             response.getOutputStream().write(image);
         } catch (IOException e) {
-            e.printStackTrace();
+            LogManager.getLogger(SenseItDataController.class).error("Error while getting the image", e);
         }
 
     }

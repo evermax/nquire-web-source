@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
 
 import org.greengin.nquireit.entities.activities.senseit.SenseItActivity;
 import org.greengin.nquireit.entities.activities.senseit.SenseItProfile;
@@ -111,7 +112,7 @@ public class SenseItSeriesManipulator extends DataItemManipulator<SenseItActivit
             return valid;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LogManager.getLogger(SenseItSeriesManipulator.class).error(e);
             return false;
         }
     }
