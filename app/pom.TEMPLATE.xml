@@ -44,8 +44,11 @@
             <artifactId>raven-log4j2</artifactId>
             <version>6.0.0</version>
         </dependency>
-        
-        <!-- Bridge from commons to log4j -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-jcl</artifactId>
@@ -172,6 +175,12 @@
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-google</artifactId>
             <version>1.0.0.M3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>2.0.3.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -326,13 +335,20 @@
             <artifactId>hibernate-core</artifactId>
             <version>4.3.4.Final</version>
         </dependency>
-
+        
+        <!-- Update logging system for hibernate to be able to use log4j2 -->
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4</version>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.2.0.Final</version>
         </dependency>
-
+        
+        <!-- Add the Tincan library -->
+        <dependency>
+            <groupId>gov.adlnet</groupId>
+            <artifactId>jxapi</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 
 
