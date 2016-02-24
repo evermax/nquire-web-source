@@ -7,6 +7,8 @@ import gov.adlnet.xapi.model.Attachment;
 import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.Verb;
 import gov.adlnet.xapi.model.Verbs;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -25,6 +27,10 @@ public class TincanSender {
     /*
      * Project related methods
      */
+    @Async
+    public static void StoreCreateProject(UserProfile user, String projectId) {
+        StoreProjectActivity(user, Verbs.initialized(), projectId, null);
+    }
     @Async
     public static void StoreOpenProject(UserProfile user, String projectId) {
         StoreProjectActivity(user, Verbs.launched(), projectId, null);
@@ -124,7 +130,7 @@ public class TincanSender {
         Statement statement = new Statement(agent, Verbs.initialized(), activity);
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
-        StoreStatement(statement);
+        StoreStatement(statement, user);
     }
     
     @Async
@@ -147,7 +153,7 @@ public class TincanSender {
         Statement statement = new Statement(agent, Verbs.commented(), activity);
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
-        StoreStatement(statement);
+        StoreStatement(statement, user);
     }
 
     
@@ -165,22 +171,49 @@ public class TincanSender {
         Statement statement = new Statement(agent, verb, activity);
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
-        StoreStatement(statement);
+        StoreStatement(statement, null);
     }
     
-    private static void StoreStatement(Statement statement) {
+    private static void StoreStatement(Statement statement, UserProfile user) {
+        StatementClient client;
         try {
-            System.out.println(AppDetails.LRS_URI);
-            StatementClient client = new StatementClient(AppDetails.LRS_URI, AppDetails.LRS_USERNAME, AppDetails.LRS_PASSWORD);
-            
-            String id = client.postStatement(statement);
-            // Should we do something with this id?
-            System.out.println(id);
+            client = new StatementClient(AppDetails.LRS_URI, AppDetails.LRS_USERNAME, AppDetails.LRS_PASSWORD);
+        } catch (MalformedURLException ex) {
+            LogManager.getLogger(TincanSender.class).error(
+                    String.format("Error while building our own LRS's client for the statement %s", statement.toString()), ex);
+            return;
+        }
+        try {
+            // Should we do something with the returned id
+            client.postStatement(statement);
         } catch (Exception e) {
-            LogManager.getLogger(TincanSender.class).error("An error occured while putting the following record:\nAgent: "
-                    + statement.getActor()
-                    + "\nVerb: " + statement.getVerb()
-                    + "\nActivity: " + statement.getObject(), e);
+            LogManager.getLogger(TincanSender.class).error(
+                    String.format("An error occured when posting the statement %s to our LRS", statement.toString()), e);
+        }
+    
+        String clientId = user.getMetadata().get(UserProfile.CLIENT_ID_KEY);
+        String secret = user.getMetadata().get(UserProfile.CLIENT_SECRET_KEY);
+        String accessTokenUrl = user.getMetadata().get(UserProfile.ACCESS_TOKEN_URL_KEY);
+        String lrsUrl = user.getMetadata().get(UserProfile.LRS_URL_KEY);
+        if (clientId != null && !"".equals(clientId) 
+                && secret != null && !"".equals(secret) 
+                && accessTokenUrl != null && !"".equals(accessTokenUrl)
+                && lrsUrl != null && !"".equals(lrsUrl)) {
+            // Send to user specific LRS as well.
+            StatementClient userClient;
+            try {
+                userClient = new StatementClient(lrsUrl, "", "");
+            } catch (MalformedURLException ex) {
+                LogManager.getLogger(TincanSender.class).error(
+                        String.format("Error while building the user's LRS client for the statement %s", statement), ex);
+                return;
+            }
+            try {
+                userClient.postStatement(statement);
+            } catch (IOException ex) {
+                LogManager.getLogger(TincanSender.class).error(
+                    String.format("An error occured when posting the statement %s to the user's LRS", statement.toString()), ex);
+            }
         }
     }
 }

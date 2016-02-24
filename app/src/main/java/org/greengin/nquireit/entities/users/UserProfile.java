@@ -14,6 +14,16 @@ import java.util.List;
 
 @Entity
 public class UserProfile extends AbstractEntity implements UserDetails {
+    
+    /*
+     * Series of keys for metadata for OAuth
+     */
+    public static final String LRS_URL_KEY = "lrs_url";
+    public static final String CLIENT_ID_KEY = "client_id";
+    public static final String CLIENT_SECRET_KEY = "client_secret";
+    public static final String ACCESS_TOKEN_URL_KEY = "access_token_url";
+    public static final String REFRESH_TOKEN_KEY = "refresh_token";
+    public static final String TOKEN_KEY = "refresh_token";
 
     @Basic
     @Setter
@@ -96,6 +106,11 @@ public class UserProfile extends AbstractEntity implements UserDetails {
             if (!visibility.containsKey(key)) {
                 visibility.put(key, true);
             }
+        }
+        
+        for (String key : new String[] {LRS_URL_KEY, CLIENT_ID_KEY, CLIENT_SECRET_KEY,
+                ACCESS_TOKEN_URL_KEY, REFRESH_TOKEN_KEY, TOKEN_KEY}) {
+            visibility.put(key, false);
         }
 
         return visibility;

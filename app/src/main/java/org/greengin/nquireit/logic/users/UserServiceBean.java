@@ -441,7 +441,11 @@ System.out.println(url.toString());
             response.setImage(profile.getImage());
 
             if (profile.getVisibility().get("metadata") && profile.getMetadata() != null) {
-                response.getMetadata().putAll(profile.getMetadata());
+                for (String key : profile.getMetadata().keySet()) {
+                    if(profile.getVisibility().get(key) != null && profile.getVisibility().get(key)) {
+                        response.getMetadata().put(key, profile.getMetadata().get(key));
+                    }
+                }
             }
 
             boolean joined = profile.getVisibility().get("projectsJoined");

@@ -41,7 +41,7 @@ Fill in the files with `.env` extension.
 - `rabbit.env` environment variables for the rabbitmq image (used by the LRS as well):
 	- `RABBITMQ_DEFAULT_USER`: Rabbitmq name
 	- `RABBITMQ_DEFAULT_PASS`: Rabbitmq password
-- `sentry.env` 
+- `sentry.env`
 	- `SECRET_KEY`
 	- `SENTRY_URL_PREFIX`: http://example.com, this must be the url after proxying.
 	- `DATABASE_URL`: postgres://user:pwd@postgres/dbname
@@ -147,7 +147,9 @@ npm install grunt-angular-gettext --save-dev
 To add a new user-interface language, ensure that it is listed in:
 
 * [`Gruntfile.js`][]
-* [`static/src/js/app/app.js`][]
+* [`static/src/js/app/config.js`][]
+
+In the `config.js`, it is the regex in `lang_url_regex`, as well as the two variables `langs` and `lang_admin_texts` that should be changed.
 
 It will then need to be added to our Weblate translation server.
 

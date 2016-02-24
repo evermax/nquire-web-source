@@ -1,7 +1,8 @@
 package org.greengin.nquireit.logic.project.challenge;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,6 +17,7 @@ import org.greengin.nquireit.logic.project.activity.AbstractActivityActions;
 import org.greengin.nquireit.logic.project.ProjectResponse;
 import org.greengin.nquireit.logic.rating.VoteCount;
 import org.greengin.nquireit.logic.rating.VoteRequest;
+import org.greengin.nquireit.logic.tincan.TincanSender;
 
 public class ChallengeActivityActions extends AbstractActivityActions<ChallengeActivity> {
 
@@ -209,6 +211,22 @@ public class ChallengeActivityActions extends AbstractActivityActions<ChallengeA
         if (hasAccess(PermissionType.PROJECT_MEMBER_ACTION) && activity.getStage() == ChallengeActivityStage.PROPOSAL) {
             context.getChallengeDao().submitAnswer(activity, user, answerId, published);
             context.getProjectDao().updateActivityTimestamp(project);
+            if (published) {
+                Map<Long, String> answers = context.getChallengeDao().getAnswer(activity, answerId).getFieldValues();
+                HashMap<String, String> answerMap = new HashMap<String, String>();
+                for (Long key : answers.keySet()) {
+                    answerMap.put(context.getChallengeDao().getField(activity, key).getLabel(), answers.get(key));
+                }
+                final HashMap<String, String> answer = answerMap;
+                final UserProfile usr = user;
+                final String id = project.getId().toString();
+                context.getTaskExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        TincanSender.StoreSubmitAnswerWinitProject(usr, id, answer);
+                    }
+                });
+            }
             return getAnswersForParticipant();
         }
 

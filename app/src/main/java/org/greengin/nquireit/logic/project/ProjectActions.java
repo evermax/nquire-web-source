@@ -1,5 +1,6 @@
 package org.greengin.nquireit.logic.project;
 
+import java.util.ArrayList;
 import org.greengin.nquireit.entities.projects.Project;
 import org.greengin.nquireit.entities.projects.ProjectType;
 import org.greengin.nquireit.entities.rating.Comment;
@@ -23,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 public class ProjectActions extends AbstractContentManager {
 
@@ -74,7 +74,7 @@ public class ProjectActions extends AbstractContentManager {
      */
     public ProjectListResponse getProjects(String typeStr, String status, String filter, String keyword) {
 
-        List<ProjectResponse> filtered = new Vector<ProjectResponse>();
+        List<ProjectResponse> filtered = new ArrayList<ProjectResponse>();
         HashMap<String, Integer> categories = new HashMap<String, Integer>();
 
         categories.put("challenge", 0);
@@ -157,7 +157,7 @@ public class ProjectActions extends AbstractContentManager {
     }
 
     public List<SimpleProjectResponse> getProjectsSimple(String type) {
-        List<SimpleProjectResponse> response = new Vector<SimpleProjectResponse>();
+        List<SimpleProjectResponse> response = new ArrayList<SimpleProjectResponse>();
 
         if (hasAccess(PermissionType.BROWSE)) {
             List<Project> all = context.getProjectDao().getProjectsSimple(type);
@@ -182,6 +182,14 @@ public class ProjectActions extends AbstractContentManager {
         if (hasAccess(PermissionType.CREATE_PROJECT)) {
             Project project = context.getProjectDao().createProject(projectData, user);
             context.getLogManager().projectCreationAction(user, project, true);
+            final UserProfile usr = user;
+            final String id = project.getId().toString();
+            context.getTaskExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    TincanSender.StoreCreateProject(usr, id);
+                }
+            });
             return project.getId();
         }
         return null;
@@ -339,7 +347,7 @@ public class ProjectActions extends AbstractContentManager {
      */
 
     public List<CommentFeedResponse> getProjectCommentFeed() {
-        List<CommentFeedResponse> list = new Vector<CommentFeedResponse>();
+        List<CommentFeedResponse> list = new ArrayList<CommentFeedResponse>();
         for (Comment c : context.getCommentsDao().commentsFeed(Project.class, 3)) {
             list.add(new CommentFeedResponse(c));
         }

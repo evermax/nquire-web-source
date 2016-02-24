@@ -236,6 +236,27 @@
                 <span class="profile-logged-in-right-section-data-label" translate>Interests:</span>
                 <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.interests}}</span>
             </div>
+            <h1 translate>LRS authentication</h1>
+            <div class="profile-logged-in-right-section-data">
+              <span class="profile-logged-in-right-section-data-label" translate>LRS URL:</span>
+              <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.lrs_url}}</span>
+            </div>
+            <div class="profile-logged-in-right-section-data">
+              <span class="profile-logged-in-right-section-data-label" translate>Client ID:</span>
+              <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.client_id}}</span>
+            </div>
+            <div class="profile-logged-in-right-section-data">
+              <span class="profile-logged-in-right-section-data-label" translate>Client Secret:</span>
+              <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.client_secret}}</span>
+            </div>
+            <div class="profile-logged-in-right-section-data">
+              <span class="profile-logged-in-right-section-data-label" translate>Authorization URL:</span>
+              <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.auth_url}}</span>
+            </div>
+            <div class="profile-logged-in-right-section-data">
+              <span class="profile-logged-in-right-section-data-label" translate>Token Access URL:</span>
+              <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.access_token_url}}</span>
+            </div>
         </div>
 
 
@@ -260,6 +281,40 @@
                     <label for="interests" translate>My interests:</label>
                     <input id="interests" class="form-control" type="text"
                            data-ng-model="form.values.metadata.interests"/>
+                </div>
+                <h1 translate>LRS authentication</h1>
+                <div class="project-item-text-container" translate>
+                    In order to record your learnings onto your personal LRS,
+                    or any other LRS that the one on the website,
+                    you need to provide the follow information, knowing that we use OAuth2 authentication:
+                </div>
+                <div>
+                    (If asked during the setup, the redirect url will be: <input value="http://inquisit.fr/lrs/oauth/{{status.profile.id}}" disabled>)
+                </div>
+                <div class="form-group">
+                    <label for="clientId" translate>LRS URL:</label>
+                    <input id="clientId" class="form-control" type="text"
+                           data-ng-model="form.values.metadata.lrs_url"/>
+                </div>
+                <div class="form-group">
+                    <label for="clientId" translate>Client ID:</label>
+                    <input id="clientId" class="form-control" type="text"
+                           data-ng-model="form.values.metadata.client_id"/>
+                </div>
+                <div class="form-group">
+                    <label for="clientId" translate>Client Secret:</label>
+                    <input id="clientId" class="form-control" type="text"
+                           data-ng-model="form.values.metadata.client_secret"/>
+                </div>
+                <div class="form-group">
+                    <label for="clientId" translate>Authorization URL:</label>
+                    <input id="clientId" class="form-control" type="text"
+                           data-ng-model="form.values.metadata.auth_url"/>
+                </div>
+                <div class="form-group">
+                    <label for="clientId" translate>Token Access URL:</label>
+                    <input id="clientId" class="form-control" type="text"
+                           data-ng-model="form.values.metadata.access_token_url"/>
                 </div>
 
                 <div class="btn-group">

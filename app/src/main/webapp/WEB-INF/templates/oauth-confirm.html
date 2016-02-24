@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Oauth confirm</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>Thanks for authenticating, you should be redirected shortly to the web site.</div>
+        <div>If not, click on <a href="/#/profile"></a></div>
+        <script type="text/javascript">
+            window.onload = function(){
+                setTimeout( function(){
+                    window.location.href = "/#/profile";
+                }, 1000);
+            };
+        </script>
+    </body>
+</html>
