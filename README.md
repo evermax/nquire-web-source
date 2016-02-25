@@ -71,6 +71,7 @@ docker create --name psql_data -v /var/lib/postgresql/data/pgdata busybox
 
 ```
 docker create --name mail_data -v /var/mail busybox
+```
 
 
 #### Launch the project

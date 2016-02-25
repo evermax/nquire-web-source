@@ -8,6 +8,10 @@
       autoindex on;
       alias   /nquire/;
     }
+    location ~* ^\/(es|fr|el)$ {
+      default_type text/html;
+      alias /nquire/index.html;
+    }
     location /api {
       proxy_pass      http://${NQUIRE_PORT_8080_TCP_ADDR}:${NQUIRE_PORT_8080_TCP_PORT};
     }
