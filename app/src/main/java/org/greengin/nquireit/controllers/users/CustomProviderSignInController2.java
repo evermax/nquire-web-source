@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.social.ApiException;
@@ -150,6 +151,7 @@ public class CustomProviderSignInController2 implements InitializingBean {
     }
 
     private RedirectView signInError(Exception e) {
+        LogManager.getLogger(CustomProviderSignInController2.class).error("Error while signin with provider", e);
         URIBuilder builder = URIBuilder.fromUri(signInUrl).queryParam("error", "provider");
         builder.queryParam("m", e.getMessage());
         if (e instanceof ApiException) {
