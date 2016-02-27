@@ -9,22 +9,11 @@
 
     <properties>
         <spring.version>4.0.0.RELEASE</spring.version>
-        <org.springframework.security.version>3.2.3.RELEASE</org.springframework.security.version>
-        <org.springframework.social.version>1.1.0.RC1</org.springframework.social.version>
+        <org.springframework.security.version>3.2.9.RELEASE</org.springframework.security.version>
+        <org.springframework.social.version>1.1.1.RELEASE</org.springframework.social.version>
+        <com.fasterxml.jackson.core.version>2.7.2</com.fasterxml.jackson.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>spring.social.google</id>
-            <name>Spring Social Google</name>
-            <url>https://github.com/GabiAxel/maven/raw/master/</url>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <url>http://repo.springsource.org/libs-milestone/</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -38,7 +27,7 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>net.kencochrane.raven</groupId>
             <artifactId>raven-log4j2</artifactId>
@@ -61,7 +50,7 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-		
+
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -91,19 +80,19 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.3.2</version>
+            <version>${com.fasterxml.jackson.core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.3.2</version>
+            <version>${com.fasterxml.jackson.core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.3.2</version>
+            <version>${com.fasterxml.jackson.core.version}</version>
         </dependency>
 
         <dependency>
@@ -174,9 +163,9 @@
         <dependency>
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-google</artifactId>
-            <version>1.0.0.M3</version>
+            <version>1.0.0.RELEASE</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
@@ -335,14 +324,14 @@
             <artifactId>hibernate-core</artifactId>
             <version>4.3.4.Final</version>
         </dependency>
-        
+
         <!-- Update logging system for hibernate to be able to use log4j2 -->
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>3.2.0.Final</version>
         </dependency>
-        
+
         <!-- Add the Tincan library -->
         <dependency>
             <groupId>gov.adlnet</groupId>
