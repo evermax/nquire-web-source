@@ -20,10 +20,10 @@
         <property name="arguments">
             <list>
                 <value>${app.url}</value>
-                <value>http://${LRS_PORT_8080_TCP_ADDR}:${LRS_PORT_8080_TCP_PORT}/xAPI</value>
+                <value>http://lrs:8080/xAPI</value>
                 <value>${LRS_ADMIN_NAME}</value>
                 <value>${LRS_ADMIN_PASS}</value>
-                <value>${MAIL_PORT_25_TCP_ADDR}</value>
+                <value>mail</value>
                 <value>${mail.sender}</value>
                 <value>${mail.name}</value>
             </list>
