@@ -48,4 +48,7 @@ public class JacksonObjectMapper extends ObjectMapper {
         addMixIn(ForumNode.class, ForumNodeMixIn.class);
         addMixIn(ForumThread.class, ForumThreadMixIn.class);
     }
+    private void addMixIn(Class<?> object, Class<?> mixin) {
+        addMixInAnnotations(object, mixin);
+    }
 }
