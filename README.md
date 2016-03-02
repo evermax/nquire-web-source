@@ -80,12 +80,14 @@ docker create --name mail_data -v /var/mail busybox
 docker-compose up -d
 ```
 
-Un long processus va se lancer, il faut donc être patient avant de penser que ça ne marche pas.
-Étant donné que la partie `nquire` dépend de tous les autres modules, ce sera le dernier à se lancer. Ainsi consulter ses logs en faisant `docker-compose log nquire` est un bon moyen de savoir où le lancement du projet en est.
+A long process is going to start, you will need to wait quite a lot. You can remove the `-d` the first time to see how long it takes and have an idea about what is happening. There are some errors but most of them are quite normal.
+Considering the `nquire` container has dependencies from all other modules and is quite long to launch, you should check the logs using `docker-compose log nquire`, it will give you an idea if the project is launched or not.
 
-Si Sentry ou le LRS posent problème, le mieux et de faire : `docker-compose down`
+If there is any problem the very first time you launch it, stop everything : `docker-compose down`
 
-Et de relancer à nouveau : `docker-compose up -d`
+And start it again: `docker-compose up -d`.
+
+There are some weird issue the first time when populating the database for the first time and I can't really put my hands on it.
 ```
 
 #### Make backups of the data volume containers:
