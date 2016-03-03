@@ -89,6 +89,17 @@ And start it again: `docker-compose up -d`.
 
 There are some weird issue the first time when populating the database for the first time and I can't really put my hands on it.
 
+#### Access the database
+
+If you want to access the database for various reasons, you can always do something like this:
+
+```
+docker run -it --rm --link nquirewebsource_mysql_1:mysql --net=nquirewebsource_default mysql/mysql-server sh -c 'exec mysql -h mysql -P 3306 -u root -p'
+```
+
+Then enter the root password that you provided inside `mysql.env`.
+
+
 #### Make backups of the data volume containers:
 
 This is quite important in order not to loose your data.
