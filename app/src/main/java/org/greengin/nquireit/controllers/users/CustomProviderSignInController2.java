@@ -260,8 +260,8 @@ public class CustomProviderSignInController2 implements InitializingBean {
 
     private RedirectView handleSignIn(Connection<?> connection, ConnectionFactory<?> connectionFactory, NativeWebRequest request) {
         List<String> userIds = usersConnectionRepository.findUserIdsWithConnection(connection);
-        if (userIds.size() == 0) {
-            ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
+        if (userIds.isEmpty()) {
+            ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection, connectionFactoryLocator, usersConnectionRepository);
             sessionStrategy.setAttribute(request, ProviderSignInAttempt.SESSION_ATTRIBUTE, signInAttempt);
             return redirect(signUpUrl);
         } else if (userIds.size() == 1) {

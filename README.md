@@ -88,13 +88,12 @@ If there is any problem the very first time you launch it, stop everything : `do
 And start it again: `docker-compose up -d`.
 
 There are some weird issue the first time when populating the database for the first time and I can't really put my hands on it.
-```
 
 #### Make backups of the data volume containers:
 
 This is quite important in order not to loose your data.
 
-whe can image having those scripts in a cron script.
+We can image having those scripts in a cron script.
 
 ```
 docker run --rm \

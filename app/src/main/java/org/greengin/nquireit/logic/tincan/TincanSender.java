@@ -191,28 +191,37 @@ public class TincanSender {
                     String.format("An error occured when posting the statement %s to our LRS", statement.toString()), e);
         }
     
-        String clientId = user.getMetadata().get(UserProfile.CLIENT_ID_KEY);
-        String secret = user.getMetadata().get(UserProfile.CLIENT_SECRET_KEY);
-        String accessTokenUrl = user.getMetadata().get(UserProfile.ACCESS_TOKEN_URL_KEY);
-        String lrsUrl = user.getMetadata().get(UserProfile.LRS_URL_KEY);
-        if (clientId != null && !"".equals(clientId) 
-                && secret != null && !"".equals(secret) 
-                && accessTokenUrl != null && !"".equals(accessTokenUrl)
-                && lrsUrl != null && !"".equals(lrsUrl)) {
-            // Send to user specific LRS as well.
-            StatementClient userClient;
-            try {
-                userClient = new StatementClient(lrsUrl, "", "");
-            } catch (MalformedURLException ex) {
-                LogManager.getLogger(TincanSender.class).error(
-                        String.format("Error while building the user's LRS client for the statement %s", statement), ex);
-                return;
+        if (user != null && user.getMetadata() != null) {
+            String clientId = user.getMetadata().get(UserProfile.CLIENT_ID_KEY);
+            String secret = user.getMetadata().get(UserProfile.CLIENT_SECRET_KEY);
+            String accessTokenUrl = user.getMetadata().get(UserProfile.ACCESS_TOKEN_URL_KEY);
+            String lrsUrl = user.getMetadata().get(UserProfile.LRS_URL_KEY);
+            if (clientId != null && !"".equals(clientId) 
+                    && secret != null && !"".equals(secret) 
+                    && accessTokenUrl != null && !"".equals(accessTokenUrl)
+                    && lrsUrl != null && !"".equals(lrsUrl)) {
+                // Send to user specific LRS as well.
+                StatementClient userClient;
+                try {
+                    userClient = new StatementClient(lrsUrl, "", "");
+                } catch (MalformedURLException ex) {
+                    LogManager.getLogger(TincanSender.class).error(
+                            String.format("Error while building the user's LRS client for the statement %s", statement), ex);
+                    return;
+                }
+                try {
+                    userClient.postStatement(statement);
+                } catch (IOException ex) {
+                    LogManager.getLogger(TincanSender.class).error(
+                        String.format("An error occured when posting the statement %s to the user's LRS", statement.toString()), ex);
+                }
             }
-            try {
-                userClient.postStatement(statement);
-            } catch (IOException ex) {
-                LogManager.getLogger(TincanSender.class).error(
-                    String.format("An error occured when posting the statement %s to the user's LRS", statement.toString()), ex);
+        } else {
+            if (user == null) {
+                LogManager.getLogger(TincanSender.class).warn("User is null");
+            } else {
+                LogManager.getLogger(TincanSender.class).warn(
+                        String.format("User with id %s don't have metadata", user.getId().toString()));
             }
         }
     }
