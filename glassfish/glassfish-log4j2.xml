@@ -3,7 +3,7 @@
     <appenders>
         <Raven name="Sentry">
             <dsn>
-                http://${env:SENTRY_INITIAL_KEY}@sentry:9000/2
+                http://${env:SENTRY_INITIAL_KEY}@sentry:9000/1
             </dsn>
             <tags>
                 glassfish:4
@@ -16,6 +16,9 @@
             <appender-ref ref="Sentry"/>
         </root>
         <logger name="org.hibernate" level="info">
+            <appender-ref ref="Sentry"/>
+        </logger>
+        <logger name="org.hibernate.tool.hbm2ddl" level="info">
             <appender-ref ref="Sentry"/>
         </logger>
     </loggers>

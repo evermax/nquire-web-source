@@ -14,6 +14,8 @@ services:
       - nquire
       - sentry
       - lrs
+    networks:
+      - front
 
   nquire:
     image: dirichlet/glassfish
@@ -29,12 +31,17 @@ services:
       - mysql.env
       - lrs.env
       - sentry.env
+    networks:
+      - front
+      - back
     entrypoint: /gf/glassfish-start.sh
     command: nquire-it.war
 
   mysql:
     image: mysql/mysql-server
     env_file: mysql.env
+    networks:
+      - back
     volumes:
       - mysql_data:/var/lib/mysql
     command: mysqld --sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
@@ -44,6 +51,8 @@ services:
     hostname: mail
     domainname: example.com
     # the FQDN will be 'mail.example.com'
+    networks:
+      - front
     ports:
       - "25:25"
       - "143:143"
@@ -57,6 +66,9 @@ services:
   # LRS and dependencies
   lrs:
     image: dirichlet/lrs
+    networks:
+      - front
+      - back
     links:
       - postgres
       - rabbitmq
@@ -69,10 +81,15 @@ services:
     image: rabbitmq:3.6
     env_file: rabbitmq.env
     privileged: true
+    networks:
+      - back
 
   # Sentry and dependencies
   sentry:
     image: slafs/sentry
+    networks:
+      - front
+      - back
     links:
       - redis
       - postgres
@@ -96,10 +113,14 @@ services:
 
   redis:
     image: redis
+    networks:
+      - back
   # postgres for both lrs and sentry
   postgres:
     image: postgres
     env_file: psql.env
+    networks:
+      - back
     volumes:
       - psql_data:/var/lib/postgresql/data/pgdata
 
@@ -110,3 +131,8 @@ volumes:
     driver: local
   mail_data:
     driver: local
+networks:
+  front:
+    driver: bridge
+  back:
+    driver: bridge

@@ -3,7 +3,7 @@
     <appenders>
         <Raven name="Sentry">
             <dsn>
-                http://${env:SENTRY_INITIAL_KEY}@sentry:9000/2
+                http://${env:SENTRY_INITIAL_KEY}@sentry:9000/1
             </dsn>
             <tags>
                 spring:4,nquire:web
