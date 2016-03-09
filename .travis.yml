@@ -1,0 +1,20 @@
+language: node_js
+node_js:
+  - "0.11"
+#  - "0.10"
+
+install:
+  - npm install -g grunt-cli
+  - npm install
+
+before_script:
+  - npm run setup-config-js
+  - npm run setup-java
+  - ls static/src/js/app/ && ls app/
+  - npm run versions
+
+script:
+  - grunt
+  - npm run compile-java
+
+#after_script:

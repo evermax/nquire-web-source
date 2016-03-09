@@ -53,9 +53,9 @@ module.exports = function(grunt) {
 				options: {
 					// I18n / translation - list available languages, except 'en' [Bug: #3]
 					'locales': [
-            'el',
-            'es',
-            'fr'
+						'el',
+						'es',
+						'fr'
 					],
 					poFilesPath: 'po/<%= locale %>.po'
 				}
@@ -66,6 +66,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-angular-gettext');
 	grunt.loadNpmTasks('grunt-msg-init-merge');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-nice-package');
 	grunt.loadNpmTasks('grunt-sass');
 
 	grunt.registerTask('gettext', [
@@ -74,5 +75,5 @@ module.exports = function(grunt) {
 		'msgInitMerge'
 	]);
 
-	grunt.registerTask('default', [ 'gettext', 'sass', 'jshint:config' ]);
+	grunt.registerTask('default', [ 'gettext', 'sass', 'jshint:config', 'nice-package' ]);
 };

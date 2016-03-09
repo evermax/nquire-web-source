@@ -21,4 +21,4 @@ static/src/js/app/min/
 docker-compose.yml
 postfix/
 spamassassin/
-
+*.po~
