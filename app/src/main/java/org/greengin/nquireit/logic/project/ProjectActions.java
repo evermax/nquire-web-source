@@ -182,14 +182,7 @@ public class ProjectActions extends AbstractContentManager {
         if (hasAccess(PermissionType.CREATE_PROJECT)) {
             Project project = context.getProjectDao().createProject(projectData, user);
             context.getLogManager().projectCreationAction(user, project, true);
-            final UserProfile usr = user;
-            final String id = project.getId().toString();
-            context.getTaskExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    TincanSender.StoreCreateProject(usr, id);
-                }
-            });
+            TincanSender.StoreCreateProject(user, project.getId().toString(), context.getTaskExecutor());
             return project.getId();
         }
         return null;
@@ -247,14 +240,8 @@ public class ProjectActions extends AbstractContentManager {
             context.getProjectDao().updateActivityTimestamp(project);
             context.getLogManager().projectMembershipAction(user, project, true);
             
-            final UserProfile usr = user;
-            final String id = projectId.toString();
-            context.getTaskExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    TincanSender.StoreJoinProject(usr, id);
-                }
-            });
+            TincanSender.StoreJoinProject(user, projectId.toString(), context.getTaskExecutor());
+            
             return context.getSubscriptionManager().getAccessLevel(project, user);
         }
         return null;
@@ -266,14 +253,8 @@ public class ProjectActions extends AbstractContentManager {
             context.getProjectDao().updateActivityTimestamp(project);
             context.getLogManager().projectMembershipAction(user, project, false);
             
-            final UserProfile usr = user;
-            final String id = projectId.toString();
-            context.getTaskExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    TincanSender.StoreLeaveProject(usr, id);
-                }
-            });
+            TincanSender.StoreLeaveProject(user, projectId.toString(), context.getTaskExecutor());
+            
             return context.getSubscriptionManager().getAccessLevel(project, user);
         }
 
@@ -285,22 +266,10 @@ public class ProjectActions extends AbstractContentManager {
             context.getProjectDao().setOpen(project, open);
             context.getProjectDao().updateActivityTimestamp(project);
             
-            final UserProfile usr = user;
-            final String id = projectId.toString();
             if (open) {
-                context.getTaskExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        TincanSender.StoreOpenProject(usr, id);
-                    }
-                });
+                TincanSender.StoreOpenProject(user, projectId.toString(), context.getTaskExecutor());
             } else {
-                context.getTaskExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        TincanSender.StoreCloseProject(usr, id);
-                    }
-                });
+                TincanSender.StoreCloseProject(user, projectId.toString(), context.getTaskExecutor());
             }
             return projectResponse(project);
         }
@@ -389,14 +358,8 @@ public class ProjectActions extends AbstractContentManager {
                 }
             });
             
-            final UserProfile usr = user;
-            final String comment = request.getComment();
-            context.getTaskExecutor().execute( new Runnable() {
-                @Override
-                public void run() {
-                    TincanSender.StoreCommentProject(usr, projId, comment);
-                }
-            });
+            TincanSender.StoreCommentProject(user, project.getId().toString(),
+                    request.getComment(), context.getTaskExecutor());
 
             return project.getComments();
         }

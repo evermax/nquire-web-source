@@ -11,10 +11,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
+import org.greengin.nquireit.dao.ChallengeDao;
+import org.greengin.nquireit.entities.activities.base.AbstractActivity;
 import org.greengin.nquireit.entities.users.UserProfile;
 import org.greengin.nquireit.utils.AppDetails;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 
 /**
@@ -27,32 +31,27 @@ public class TincanSender {
     /*
      * Project related methods
      */
-    @Async
-    public static void StoreCreateProject(UserProfile user, String projectId) {
-        StoreProjectActivity(user, Verbs.initialized(), projectId, null);
+    public static void StoreCreateProject(UserProfile user, String projectId, TaskExecutor taskExecutor) {
+        StoreProjectActivity(user, Verbs.initialized(), projectId, taskExecutor, null);
     }
-    @Async
-    public static void StoreOpenProject(UserProfile user, String projectId) {
-        StoreProjectActivity(user, Verbs.launched(), projectId, null);
+
+    public static void StoreOpenProject(UserProfile user, String projectId, TaskExecutor taskExecutor) {
+        StoreProjectActivity(user, Verbs.launched(), projectId, taskExecutor, null);
     }
-    
-    @Async
-    public static void StoreCloseProject(UserProfile user, String projectId) {
-        StoreProjectActivity(user, Verbs.terminated(), projectId, null);
+
+    public static void StoreCloseProject(UserProfile user, String projectId, TaskExecutor taskExecutor) {
+        StoreProjectActivity(user, Verbs.terminated(), projectId, taskExecutor, null);
     }
     
-    @Async
-    public static void StoreJoinProject(UserProfile user, String projectId) {
-        StoreProjectActivity(user, Verbs.attended(), projectId, null);
+    public static void StoreJoinProject(UserProfile user, String projectId, TaskExecutor taskExecutor) {
+        StoreProjectActivity(user, Verbs.attended(), projectId, taskExecutor, null);
     }
     
-    @Async
-    public static void StoreLeaveProject(UserProfile user, String projectId) {
-        StoreProjectActivity(user, Verbs.exited(), projectId, null);
+    public static void StoreLeaveProject(UserProfile user, String projectId, TaskExecutor taskExecutor) {
+        StoreProjectActivity(user, Verbs.exited(), projectId, taskExecutor, null);
     }
     
-    @Async
-    public static void StoreCommentProject(UserProfile user, String projectId, String comment) {
+    public static void StoreCommentProject(UserProfile user, String projectId, String comment, TaskExecutor taskExecutor) {
         Verb verb = Verbs.commented();
         
         HashMap<String, String> commentMap = new HashMap<String, String>();
@@ -62,23 +61,29 @@ public class TincanSender {
         ArrayList<Attachment> attachments = new ArrayList<Attachment>();
         attachments.add(attachment);
         
-        StoreProjectActivity(user, verb, projectId, attachments);
+        StoreProjectActivity(user, verb, projectId, taskExecutor, attachments);
     }
     
-    @Async
-    public static void StoreSubmitAnswerWinitProject(UserProfile user, String projectId, HashMap<String, String> answer) {
+    public static void StoreSubmitAnswerWinitProject(UserProfile user, String projectId,
+            AbstractActivity activity, Long answerId, ChallengeDao challengeDao, TaskExecutor taskExecutor) {
+        
+        Map<Long, String> answers = challengeDao.getAnswer(activity, answerId).getFieldValues();
+        HashMap<String, String> answerMap = new HashMap<String, String>();
+        for (Long key : answers.keySet()) {
+            answerMap.put(challengeDao.getField(activity, key).getLabel(), answers.get(key));
+        }
+        
         Verb verb = Verbs.answered();
         
         Attachment attachment = new Attachment();
-        attachment.setDisplay(answer);
+        attachment.setDisplay(answerMap);
         ArrayList<Attachment> attachments = new ArrayList<Attachment>();
         attachments.add(attachment);
         
-        StoreProjectActivity(user, verb, projectId, attachments);
+        StoreProjectActivity(user, verb, projectId, taskExecutor, attachments);
     }
     
-    @Async
-    public static void SubmittedAnswerSenseItProject(UserProfile user, String projectId, ArrayList<String> fileUrls) {
+    public static void SubmittedAnswerSenseItProject(UserProfile user, String projectId, ArrayList<String> fileUrls, TaskExecutor taskExecutor) {
         Verb verb = Verbs.answered();
         
         Attachment attachment = new Attachment();
@@ -89,11 +94,10 @@ public class TincanSender {
         ArrayList<Attachment> attachments = new ArrayList<Attachment>();
         attachments.add(attachment);
         
-        StoreProjectActivity(user, verb, projectId, attachments);
+        StoreProjectActivity(user, verb, projectId, taskExecutor, attachments);
     }
     
-    @Async
-    public static void SubmittedAnswerSpotItProject(UserProfile user, String projectId, String imageUrl) {
+    public static void SubmittedAnswerSpotItProject(UserProfile user, String projectId, String imageUrl, TaskExecutor taskExecutor) {
         Verb verb = Verbs.answered();
         
         Attachment attachment = new Attachment();
@@ -102,15 +106,13 @@ public class TincanSender {
         ArrayList<Attachment> attachments = new ArrayList<Attachment>();
         attachments.add(attachment);
         
-        StoreProjectActivity(user, verb, projectId, attachments);
+        StoreProjectActivity(user, verb, projectId, taskExecutor, attachments);
     }
     
     /*
      * Forum related methods
      */
-    
-    @Async
-    public static void StoreCreateForumThread(UserProfile user, Long forumId, Long forumThreadId, String threadName) {
+    public static void StoreCreateForumThread(UserProfile user, Long forumId, Long forumThreadId, String threadName, TaskExecutor taskExecutor) {
         String username = user.getUsername();
         if (user.getMetadata().containsKey("name") && !"".equals(user.getMetadata().get("name"))) {
             username = user.getMetadata().get("name");
@@ -130,11 +132,17 @@ public class TincanSender {
         Statement statement = new Statement(agent, Verbs.initialized(), activity);
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
-        StoreStatement(statement, user);
+        final Statement sttmnt = statement;
+        final UserProfile usr = user;
+        taskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                StoreStatement(sttmnt, usr);
+            }
+        });
     }
     
-    @Async
-    public static void StoreCommentForumThread(UserProfile user, Long forumThreadId, String comment) {
+    public static void StoreCommentForumThread(UserProfile user, Long forumThreadId, String comment, TaskExecutor taskExecutor) {
         String username = user.getUsername();
         if (user.getMetadata().containsKey("name") && !"".equals(user.getMetadata().get("name"))) {
             username = user.getMetadata().get("name");
@@ -154,13 +162,21 @@ public class TincanSender {
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
         StoreStatement(statement, user);
+        final Statement sttmnt = statement;
+        final UserProfile usr = user;
+        taskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                StoreStatement(sttmnt, usr);
+            }
+        });
     }
 
     
     /*
      * Private methods
      */
-    private static void StoreProjectActivity(UserProfile user, Verb verb, String projectId, ArrayList<Attachment> attachments) {
+    private static void StoreProjectActivity(UserProfile user, Verb verb, String projectId, TaskExecutor taskExecutor, ArrayList<Attachment> attachments) {
         String username = user.getUsername();
         if (user.getMetadata().containsKey("name") && !"".equals(user.getMetadata().get("name"))) {
             username = user.getMetadata().get("name");
@@ -171,9 +187,16 @@ public class TincanSender {
         Statement statement = new Statement(agent, verb, activity);
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
-        StoreStatement(statement, null);
+        final Statement sttmnt = statement;
+        taskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                StoreStatement(sttmnt, null);
+            }
+        });
     }
     
+    @Async
     private static void StoreStatement(Statement statement, UserProfile user) {
         StatementClient client;
         try {

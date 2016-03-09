@@ -211,21 +211,10 @@ public class ChallengeActivityActions extends AbstractActivityActions<ChallengeA
         if (hasAccess(PermissionType.PROJECT_MEMBER_ACTION) && activity.getStage() == ChallengeActivityStage.PROPOSAL) {
             context.getChallengeDao().submitAnswer(activity, user, answerId, published);
             context.getProjectDao().updateActivityTimestamp(project);
+            
             if (published) {
-                Map<Long, String> answers = context.getChallengeDao().getAnswer(activity, answerId).getFieldValues();
-                HashMap<String, String> answerMap = new HashMap<String, String>();
-                for (Long key : answers.keySet()) {
-                    answerMap.put(context.getChallengeDao().getField(activity, key).getLabel(), answers.get(key));
-                }
-                final HashMap<String, String> answer = answerMap;
-                final UserProfile usr = user;
-                final String id = project.getId().toString();
-                context.getTaskExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        TincanSender.StoreSubmitAnswerWinitProject(usr, id, answer);
-                    }
-                });
+                TincanSender.StoreSubmitAnswerWinitProject(user, project.getId().toString(), activity, answerId,
+                        context.getChallengeDao(), context.getTaskExecutor());
             }
             return getAnswersForParticipant();
         }

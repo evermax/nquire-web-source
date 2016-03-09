@@ -81,16 +81,8 @@ public class ForumManager extends AbstractContentManager {
         if (loggedWithToken) {
             ForumThread thread = context.getForumDao().createThread(user, forumId, forumData);
             if (thread != null) {
-                final UserProfile usr = user;
-                final Long id = forumId;
-                final Long threadId = thread.getId();
-                final String title = thread.getTitle();
-                context.getTaskExecutor().execute( new Runnable() {
-                    @Override
-                    public void run() {
-                        TincanSender.StoreCreateForumThread(usr, id, threadId, title);
-                    }
-                });
+                TincanSender.StoreCreateForumThread(user, forumId, thread.getId(),
+                        thread.getTitle(), context.getTaskExecutor());
                 return thread.getId();
             }
         }
@@ -132,14 +124,7 @@ public class ForumManager extends AbstractContentManager {
                 }
             });
             
-            final UserProfile usr = user;
-            final String comment = data.getComment();
-            context.getTaskExecutor().execute( new Runnable() {
-                @Override
-                public void run() {
-                    TincanSender.StoreCommentForumThread(usr, thrId, comment);
-                }
-            });
+            TincanSender.StoreCommentForumThread(user, thrId, data.getComment(), context.getTaskExecutor());
 
             return thread;
         }
