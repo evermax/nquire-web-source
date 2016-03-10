@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - "0.11"
-#  - "0.10"
+  #- "0.10"
 
 install:
   - npm install -g grunt-cli
@@ -10,11 +10,15 @@ install:
 before_script:
   - npm run setup-config-js
   - npm run setup-java
-  - ls static/src/js/app/ && ls app/
+  #- ls static/src/js/app/ && ls app/
   - npm run versions
 
 script:
   - grunt
-  - npm run compile-java
+  # Compile Java, removing 100s of 'Downloading ..' lines in log output ...
+  - "mvn compile -f app/pom.xml | tee app/mvn.log | egrep '(ERROR|WARN|INFO)'"
+  # .. Then, ensure compile errors are caught!
+  - bash bin/travis-exit-java.sh
 
-#after_script:
+
+#End.
