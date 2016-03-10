@@ -1,5 +1,6 @@
 package org.greengin.nquireit.logic.data;
 
+import java.util.ArrayList;
 import org.greengin.nquireit.entities.data.AbstractDataProjectItem;
 import org.greengin.nquireit.entities.data.DataCollectionActivity;
 import org.greengin.nquireit.entities.rating.Comment;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
+import org.greengin.nquireit.logic.tincan.TincanSender;
 
 public abstract class DataActions<E extends AbstractDataProjectItem, F extends AbstractDataProjectItem, T extends DataCollectionActivity<E, F>>
         extends AbstractActivityActions<T> {
@@ -122,6 +124,7 @@ public abstract class DataActions<E extends AbstractDataProjectItem, F extends A
         if (response != null) {
             context.getProjectDao().updateActivityTimestamp(project);
             context.getLogManager().data(user, project, response.getNewItemId(), "create");
+            TincanSender.StoreSubmitAnswerSenseItProject(user, projectId.toString(), null, context.getTaskExecutor());
         }
         return response;
     }

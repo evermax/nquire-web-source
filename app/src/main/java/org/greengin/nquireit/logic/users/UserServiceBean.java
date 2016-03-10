@@ -341,7 +341,7 @@ System.out.println(url.toString());
                     LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha", e3);
                 }
 
-                if (string.indexOf("true") == -1&&false) {
+                if (!string.contains("true")) {
                     StatusResponse result = new StatusResponse();
                     result.setLogged(false);
                     result.setProfile(null);
@@ -384,7 +384,7 @@ System.out.println(url.toString());
             result.setProfile(null);
             result.getResponses().put("reminder", "reminder_sent");
 
-            if (string.indexOf("true") == -1) {
+            if (!string.contains("true")) {
                 result.setLogged(false);
                 result.setProfile(null);
                 result.getResponses().put("reminder", "bad_recaptcha");

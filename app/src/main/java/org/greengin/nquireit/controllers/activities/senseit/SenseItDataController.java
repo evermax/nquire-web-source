@@ -106,6 +106,7 @@ public class SenseItDataController extends AbstractSenseItController {
 
             return createManager(projectId, request).createData(new SenseItSeriesManipulator(title, geolocation, file.getInputStream(), null));
         } catch (IOException e) {
+            LogManager.getLogger(SenseItDataController.class).error(e);
             return null;
         }
     }

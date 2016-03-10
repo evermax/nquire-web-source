@@ -83,7 +83,7 @@ public class TincanSender {
         StoreProjectActivity(user, verb, projectId, taskExecutor, attachments);
     }
     
-    public static void SubmittedAnswerSenseItProject(UserProfile user, String projectId, ArrayList<String> fileUrls, TaskExecutor taskExecutor) {
+    public static void StoreSubmitAnswerSenseItProject(UserProfile user, String projectId, ArrayList<String> fileUrls, TaskExecutor taskExecutor) {
         Verb verb = Verbs.answered();
         
         Attachment attachment = new Attachment();
@@ -188,10 +188,11 @@ public class TincanSender {
         statement.setId(UUID.randomUUID().toString());
         statement.setAttachments(attachments);
         final Statement sttmnt = statement;
+        final UserProfile usr = user;
         taskExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                StoreStatement(sttmnt, null);
+                StoreStatement(sttmnt, usr);
             }
         });
     }
