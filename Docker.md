@@ -13,13 +13,11 @@ The structure of the project is now the following:
 
 The work on the app Sense-it will be published on a fork of the corresponding repo, but the main change will be to add the French translation, as all the changes about LRS communications will be on the API side.
 
-### Commands
-
-#### Setup
+### Setup
 
 Clone the directory, rename all the files with .example by removing the `.example` extension.
 
-Fill in the files with `.env` extension.
+#### Fill in the files with `.env` extension.
 
 - `mysql.env` contains all the informations about the MySQL database (used by nquire as well):
 	- `MYSQL_ROOT_PASSWORD`: MySQL root password
@@ -51,6 +49,108 @@ Fill in the files with `.env` extension.
 	- `SENTRY_INITIAL_KEY` publickey:secretkey
 	- `SENTRY_USE_REDIS_TSDB` leave this value to True or check [the repo of the image](https://github.com/slafs/sentry-docker)
 
+
+#### Set up the properties of the Java project:
+
+In `app/src/main/webapp/` you need to copy `nquireit.properties.default` into `nquireit.properties` and complete the properties as follow:
+
+If you are using docker, leave it like that. If not, you'll probably know what to put there then!
+
+```
+database.url=jdbc:mysql://mysql:3306
+persistence.unit=nquire-it-jpa
+```
+
+Those need to be set if you are using a proxy.
+Leave it empty otherwise, but don't remove it or the server will not start.
+
+```
+server.proxyHost=http://localhost
+server.proxyPort=8000
+```
+
+This is the front url on which you will deploy nquire.
+
+```
+app.url=
+```
+
+Some infos when sending emails.
+
+```
+mail.sender=
+mail.name=
+```
+
+This is some details for the password storage.
+
+```
+security.encodingSecret=secret
+security.encryptPassword=password
+security.encryptSalt=1234567890
+```
+
+Get them from Facebook if you want to use Facebook as a provider
+
+```
+facebook.clientId=id
+facebook.clientSecret=secret
+```
+
+Get them from Twitter if you want to use Twitter as a provider
+
+```
+twitter.consumerKey=id
+twitter.consumerSecret=secret
+```
+
+Get them from Google if you want to use Google as a provider.
+As a side note for this one: users without Google as a provider linked to their account
+won't be able to send informations from the app.
+
+```
+google.consumerKey=key
+google.consumerSecret=secret
+```
+
+reCaptcha site key
+
+```
+recaptcha.siteKey=key
+recaptcha.secretKey=secret
+```
+
+#### Default language
+
+The default language is english but you can change it by changing the `default_language` value in the file `static/src/js/app/config.js` (first you need to copy `static/src/js/app/config.js.DIST.html` into `static/src/js/app/config.js`)
+
+
+### Build java project using maven
+
+In order to get all the dependencies for the project, you need to run maven. Now, it wouldn't be any good to use Docker to avoid installing java (among other nice features) if you need maven on the server, so java. There is a good way to use docker for that as well!
+
+Just run the following, in this folder:
+
+First, run this just once:
+
+```
+docker run --name maven_data -v /root/.m2 busybox echo 'data for maven'
+```
+
+It will create a data volume container that will contain all the dependencies for this project.
+That way you won't have to download the dependencies when you want to build the project, but when you want to remove the project, you remove this data container as well and you won't have them either.
+
+Then, every time you want to build the java project (which is needed after every change on it, for example after each pull), just do:
+
+```
+docker run --rm -v $(pwd)/app:/project --volumes-from maven_data dirichlet/maven clean install -DskipTests
+```
+
+You can make an alias out of it to make you life easier like:
+
+```
+alias maven="docker run --rm -v $(pwd)/app:/project --volumes-from maven_data dirichlet/maven clean install -DskipTests"
+```
 
 #### Launch the project
 

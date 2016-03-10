@@ -36,6 +36,7 @@ To add a new user-interface language, ensure that it is listed in:
 * [`Gruntfile.js`][]
 * [`static/src/js/app/config.js`][]
 
+To run the project with Docker, see the Docker.md file.
 
 
 It will then need to be added to our Weblate translation server.
