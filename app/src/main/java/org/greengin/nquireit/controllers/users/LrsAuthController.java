@@ -29,7 +29,6 @@ public class LrsAuthController {
  
     @RequestMapping(value = "/lrs/oauth/{id}", method = RequestMethod.GET)
     public String getAuthorizationCode(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") Long id) {
-        System.out.println(AppDetails.LRS_URI);
         UserProfile user =  context.getUsersManager().currentUser();
         if (user == null || !user.getId().equals(id)) {
             response.setStatus(403);
@@ -39,16 +38,18 @@ public class LrsAuthController {
         String lrsUrl = user.getMetadata().get(UserProfile.LRS_URL_KEY);
         String clientId = user.getMetadata().get(UserProfile.CLIENT_ID_KEY);
         String secret = user.getMetadata().get(UserProfile.CLIENT_SECRET_KEY);
+        String accessTokenUri = user.getMetadata().get(UserProfile.ACCESS_TOKEN_URL_KEY);
         if (code == null || "".equals(code) 
                 || lrsUrl == null || "".contains(lrsUrl)
                 || clientId == null || "".equals(clientId)
-                || secret == null || "".equals(secret)) {
+                || secret == null || "".equals(secret)
+                || accessTokenUri == null || "".equals(accessTokenUri)) {
             response.setStatus(403);
             return "403";
         }
         OAuth2Client client;
         try {
-            client = new OAuth2Client(lrsUrl, clientId, secret, null, code, null);
+            client = new OAuth2Client(lrsUrl, clientId, secret, accessTokenUri, code, null);
         } catch (MalformedURLException ex) {
             LogManager.getLogger(LrsAuthController.class.getName()).error("Malformed url before getting the auth code", ex);
             return "500";

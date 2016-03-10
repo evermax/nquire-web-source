@@ -341,13 +341,13 @@ System.out.println(url.toString());
                     LogManager.getLogger(UserServiceBean.class).error("An error occured while recaptcha", e3);
                 }
 
-                if (!string.contains("true")) {
+                /*if (!string.contains("true")) {
                     StatusResponse result = new StatusResponse();
                     result.setLogged(false);
                     result.setProfile(null);
                     result.getResponses().put("registration", "bad_recaptcha");
                     return result;
-                }
+                }*/
 
                 UserProfile user = context.getUserProfileDao().createUser(data.getUsername(), data.getPassword(), data.getEmail(), false);
                 login(user, request, response);

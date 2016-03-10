@@ -257,6 +257,9 @@
               <span class="profile-logged-in-right-section-data-label" translate>Token Access URL:</span>
               <span class="profile-logged-in-right-section-data-value">{{status.profile.metadata.access_token_url}}</span>
             </div>
+            <div class="profile-logged-in-right-section-data">
+              <button data-ng-click="lrsAuthenticate()" translate>Authorize</button>
+            </div>
         </div>
 
 
@@ -289,7 +292,7 @@
                     you need to provide the follow information, knowing that we use OAuth2 authentication:
                 </div>
                 <div>
-                    (If asked during the setup, the redirect url will be: <input value="http://inquisit.fr/lrs/oauth/{{status.profile.id}}" disabled>)
+                    (If asked during the setup, the redirect url will be: <input value="{{currentUrl}}/lrs/oauth/{{status.profile.id}}" disabled>)
                 </div>
                 <div class="form-group">
                     <label for="clientId" translate>LRS URL:</label>

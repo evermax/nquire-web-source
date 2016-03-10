@@ -45,15 +45,14 @@ angular.module('senseItWeb', null, null).controller('MainCtrl', function ($scope
         //Was: location.pathname.match(/^(\/approval)?\/(el|en)/)
         var m_lang = $location.absUrl().match($scope.cfg.lang_url_regex);
 
-        $scope.activeLang = m_lang ? m_lang[ 2 ] : 'en';
+        $scope.activeLang = m_lang ? m_lang[ 2 ] : $scope.cfg.default_language;
         $scope.gettext = gettextCatalog;
         $scope._ = function (str, scope, ctx) {
             return gettextCatalog.getString(str, scope, ctx);
         }
 
-        if (m_lang) {
-            $scope.gettext.setCurrentLanguage($scope.activeLang);
-        }
+        // Allow the default language not to be en.
+        $scope.gettext.setCurrentLanguage($scope.activeLang);
 
         // navigator.languages?
         $scope.alert.debug("Lang:", $scope.cfg, m_lang, $location.absUrl(), angular.version);
@@ -70,7 +69,7 @@ angular.module('senseItWeb', null, null).controller('MainCtrl', function ($scope
 
         //$scope.txt_i18n = $scope.txt;
 
-        if (! $scope.activeLang || "en" === $scope.activeLang || is_admin_page) {
+        if (! $scope.activeLang || $scope.cfg.default_language === $scope.activeLang || is_admin_page) {
             return;
         }
 

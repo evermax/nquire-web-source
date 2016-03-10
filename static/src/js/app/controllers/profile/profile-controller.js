@@ -1,4 +1,4 @@
-angular.module('senseItWeb', null, null).controller('ProfileCtrl', function ($scope, OpenIdService, $state, fileReader) {
+angular.module('senseItWeb', null, null).controller('ProfileCtrl', function ($scope, OpenIdService, $state, fileReader, $window, $location) {
 
 	var _ = $scope._
 	  , password_min = 6;
@@ -337,5 +337,12 @@ angular.module('senseItWeb', null, null).controller('ProfileCtrl', function ($sc
       }
     }
   };
+
+  $scope.currentUrl = $location.protocol() + "://" + $location.host()
+
+  $scope.lrsAuthenticate = function() {
+    $window.location.href = $scope.status.profile.metadata.auth_url
+      + "?response_type=code&client_id=" + $scope.status.profile.metadata.client_id;
+  }
 
 });

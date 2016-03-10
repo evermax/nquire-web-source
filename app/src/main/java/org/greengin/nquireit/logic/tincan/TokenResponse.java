@@ -1,5 +1,6 @@
 package org.greengin.nquireit.logic.tincan;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 /**
@@ -9,8 +10,11 @@ import java.io.Serializable;
 public class TokenResponse implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    @JsonProperty(value = "access_token")
     private String accessToken;
+    @JsonProperty(value = "token_type")
     private String tokenType;
+    @JsonProperty(value = "refresh_token")
     private String refreshToken;
 
     public String getAccessToken() {
