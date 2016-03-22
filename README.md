@@ -14,6 +14,12 @@ app to collect data from Android device sensors.
 * <http://www.nquire-it.org>
 
 
+Fork
+----
+
+I worked on this fork for my last year project. The details of my work can be found on [this page](Docker.md) 
+
+
 Requirements
 ------------
 
